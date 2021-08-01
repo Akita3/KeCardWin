@@ -91,6 +91,8 @@ namespace KeCardWin
             format.dyLineSpacing = dyLineSpacing;
             format.bLineSpacingRule = bLineSpacingRule;
             SendMessage(this.Handle, EM_SETPARAFORMAT, SCF_DEFAULT /* SCF_SELECTION */, ref format);
+            SendMessage(this.Handle, EM_SETPARAFORMAT, SCF_SELECTION , ref format);
+
         }
 
         // コンストラクタ
@@ -98,6 +100,9 @@ namespace KeCardWin
         {
             InitializeComponent();
 
+            // 日本語入力でフォントが変わる対策
+            this.LanguageOption &= ~RichTextBoxLanguageOptions.DualFont;
+            
             // 行間隔を設定
             SetLineSpacing(2, 0);
         }
@@ -225,6 +230,9 @@ namespace KeCardWin
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        private void ExRichTextBox_TextChanged(object sender, EventArgs e)
+        {
 
+        }
     }
 }

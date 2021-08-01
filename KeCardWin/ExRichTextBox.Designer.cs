@@ -30,6 +30,10 @@ namespace KeCardWin
         private void InitializeComponent()
         {
             this.SuspendLayout();
+            // 
+            // ExRichTextBox
+            // 
+            this.TextChanged += new System.EventHandler(this.ExRichTextBox_TextChanged);
             this.ResumeLayout(false);
 
         }

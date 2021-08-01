@@ -47,7 +47,7 @@ namespace KeCardWin
             // 濃いめ？
             if ( appSetting.darkMode )
             {
-                calcImage = ImgLib.Darken(baseImage, 32);
+                calcImage = ImgLib.Darken(baseImage, 64);
             } else
             {
                 calcImage = (Bitmap)baseImage.Clone();
@@ -180,6 +180,7 @@ namespace KeCardWin
             // イメージを読み込み
             Bitmap bitmap = AppSetting.LoadBitmap(appSetting.backupImageName);
             SetKeImage(bitmap);
+
         }
 
         // キャプチャボタンクリック
@@ -187,10 +188,12 @@ namespace KeCardWin
         {
             btnCancel.Enabled = true;
 
-            Bitmap bitmap = ScCap.Capture();
+            Bitmap bitmap = ScCap.Capture(this);
             this.TopMost = true;
             formScreen.SetScreenImage(bitmap);
             formScreen.Show();
+
+            // AppSetting.SaveBitmap(bitmap, "Screen.bmp");
 
         }
 
@@ -242,6 +245,7 @@ namespace KeCardWin
             {
                 // Memo
                 transferImage = txtMemo.GetBitmap();
+                transferImage = KeImage.ImageToGray2bitImageNormal(transferImage);
             }
             else
             {
@@ -264,6 +268,9 @@ namespace KeCardWin
             tabMain.Enabled = true;
             cmbBleAddr.Enabled = true;
             cmbImageNo.Enabled = true;
+
+            // 転送イメージを保存
+            AppSetting.SaveBitmap(transferImage, appSetting.transferImageName);
 
         }
 

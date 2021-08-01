@@ -24,6 +24,7 @@ namespace KeCardWin
         public byte imageNo = 0;
         public string backupMemoName = "backupMemo.txt";
         public string backupImageName = "backupImage.png";
+        public string transferImageName = "transferImage.png";
         public bool darkMode = false;
         public ExRichTextBox.RuledLineType ruledLineType = ExRichTextBox.RuledLineType.Dash;
 

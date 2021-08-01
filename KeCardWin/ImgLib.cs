@@ -260,7 +260,7 @@ namespace KeCardWin
                 int b = dstBuf[i + 2];
 
                 int pxl = (r + g + b) / 3;
-                if (pxl < 196)
+                if (pxl < 208)
                 {
                     r -= value;
                     g -= value;
