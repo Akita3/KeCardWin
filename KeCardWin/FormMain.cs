@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using QRCoder;
 
 namespace KeCardWin
 {
@@ -32,6 +33,14 @@ namespace KeCardWin
         // Tab Index 
         private const int TAB_IDX_MEMO = 0;
         private const int TAB_IDX_IMAGE = 1;
+
+        // ブックマーク情報
+        Bookmarks bookmarks = new Bookmarks();
+        Bookmark bookmarkTemp = new Bookmark();
+
+        // ボイスコマンド
+        KeVoiceCmd keVoiceCmd = null;
+
 
         // 転送用イメージ設定
         void SetKeImage(Bitmap srcBmp)
@@ -84,20 +93,9 @@ namespace KeCardWin
             formScreen.Hide();
 
             SetKeImage(scBitmap);
-        }
 
-        //ファイルのパスを取得する
-        private string getFileNameFromDragEvent(DragEventArgs e)
-        {
-            string[] fileName = (string[])e.Data.GetData(DataFormats.FileDrop);
-            if (System.IO.File.Exists(fileName[0]) == true)
-            {
-                return fileName[0];
-            }
-            else
-            {
-                return null;
-            }
+            bookmarkTemp.rect = formScreen.selectedRect;
+            bookmarkTemp.bitmap = KeImage.FitImageSize(scBitmap);
         }
 
         // コンボボックスのBLEアドレス更新
@@ -165,6 +163,9 @@ namespace KeCardWin
             // AppSetting.saveSettings(appSetting, "AppSettings.xml");
             appSetting = AppSetting.LoadSettings("AppSettings.xml");
 
+            // ブックマーク読み込み
+            bookmarks = appSetting.GetBookmarks();
+
             // メニューを設定
             CheckMenuFilter(appSetting.imgFilter);
 
@@ -208,19 +209,40 @@ namespace KeCardWin
         // ドラッグ＆ドロップ
         private void picKeImage_DragDrop(object sender, DragEventArgs e)
         {
-            string fileName = getFileNameFromDragEvent(e);
 
-            Bitmap bitmap = new Bitmap(fileName);
-            if (bitmap == null) return;
+            // ファイル名？
+            string[] fileName = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if ( (fileName != null) 
+                && (System.IO.File.Exists(fileName[0]) == true) )
+            {
+                Bitmap bitmap = new Bitmap(fileName[0]);
+                if (bitmap == null) return;
 
-            SetKeImage(bitmap);
+                SetKeImage(bitmap);
+                return;
+            }
+            // テキスト？
+            string urlLink = (string)e.Data.GetData(DataFormats.Text);
+            if (urlLink != null)
+            {
+                QRCodeGenerator qrGenerator = new QRCodeGenerator();
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode(urlLink, QRCodeGenerator.ECCLevel.Q);
+                QRCode qrCode = new QRCode(qrCodeData);
+                Bitmap qrCodeImage = qrCode.GetGraphic(20);
+
+                SetKeImage(qrCodeImage);
+                return;
+            }
+
 
         }
 
         // ドラッグEnter
         private void picKeImage_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)
+                || e.Data.GetDataPresent(DataFormats.Text))
             {
                 e.Effect = DragDropEffects.Copy;
             }
@@ -261,7 +283,10 @@ namespace KeCardWin
             cmbImageNo.Enabled = false;
 
             // イメージ転送シーケンス
-            await KeCtrl.DataTransmissionSequence(bleAddr, transferImage, appSetting.imageNo);
+            await KeCtrl.DataTransmissionSequence(bleAddr
+                                                , transferImage
+                                                , appSetting.imageNo
+                                                , appSetting.waitAfterTransfer);
 
             // コントロール有効化
             btnCapture.Enabled = tabMain.SelectedIndex == TAB_IDX_IMAGE ? true : false;
@@ -292,6 +317,7 @@ namespace KeCardWin
         // Form Closed
         private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
         {
+
             // 設定保存
             AppSetting.SaveSettings(appSetting, "AppSettings.xml");
 
@@ -427,6 +453,132 @@ namespace KeCardWin
         {
             AboutBoxMain aboutBoxMain = new AboutBoxMain();
             aboutBoxMain.ShowDialog();
+        }
+
+        private void btnBookmark_Click(object sender, EventArgs e)
+        {
+            menuBookmark.Show(tabPageImage, new Point(btnBookmark.Left + btnBookmark.Width, btnBookmark.Top));
+        }
+
+        private void menuEditBookmark(Bookmarks b)
+        {
+            FormBookmark frm = new FormBookmark();
+            frm.bookmarks = b;
+
+            if( frm.ShowDialog() == DialogResult.OK )
+            {
+                // 今の状態を取得
+                bool voiceState = chkVoice.Checked;
+                // 強制OFF
+                KeVoiceOnOff(voiceState);
+
+                bookmarks = frm.bookmarks;
+                appSetting.SetBookmarks(bookmarks);
+                // 設定を復元
+                KeVoiceOnOff(voiceState);
+            }
+        }
+
+        private void memuAddBookmark1_Click(object sender, EventArgs e)
+        {
+            Bookmarks tmp = bookmarks.DeepCopy();
+            tmp.bookmarks[0] = bookmarkTemp.DeepCopy();
+            menuEditBookmark(tmp);
+        }
+
+        private void menuAddBookmark2_Click(object sender, EventArgs e)
+        {
+            Bookmarks tmp = bookmarks.DeepCopy();
+            tmp.bookmarks[1] = bookmarkTemp.DeepCopy();
+            menuEditBookmark(tmp);
+        }
+
+        private void menuAddBookmark3_Click(object sender, EventArgs e)
+        {
+            Bookmarks tmp = bookmarks.DeepCopy();
+            tmp.bookmarks[2] = bookmarkTemp.DeepCopy();
+            menuEditBookmark(tmp);
+        }
+
+        private void menuReferBookmark_Click(object sender, EventArgs e)
+        {
+            Bookmarks tmp = bookmarks.DeepCopy();
+            menuEditBookmark(tmp);
+        }
+
+        private void KeVoiceCmdRecognized(string word)
+        {
+            // キーワードから対象のブックマークを検索
+            Bookmark b = bookmarks.bookmarks.FirstOrDefault(x => x.keyword.Contains(word));
+            if (b == null) return;
+
+            Bitmap bitmap;
+            if ( b.mode == Bookmark.Mode.CAPTURE )
+            {
+                // キャプチャモード
+                bitmap = ScCap.Capture(this, b.rect);
+            }
+            else
+            {
+                // ファイルモード
+                bitmap = new Bitmap(b.bitmap);
+            }
+
+            if (bitmap == null) return;
+            SetKeImage(bitmap);
+
+            if( btnTransfer.Enabled == true )
+            {
+                btnTransfer_Click(null, null);
+            }
+
+        }
+
+
+        private void KeVoiceOnOff(bool sw)
+        {
+            if(sw)
+            {
+                keVoiceCmd = new KeVoiceCmd();
+                keVoiceCmd.Open(appSetting.keName , bookmarks.GetKeywords());
+                keVoiceCmd.delegateKeVoiceCmdRecognized = KeVoiceCmdRecognized;
+            }
+            else
+            {
+                if(keVoiceCmd != null)
+                {
+                    keVoiceCmd.Close();
+                    keVoiceCmd = null;
+                }
+            }
+        }
+
+        private void chkVoice_CheckedChanged(object sender, EventArgs e)
+        {
+            KeVoiceOnOff(chkVoice.Checked);
+        }
+
+        private void menuSettings_Click(object sender, EventArgs e)
+        {
+            // 設定保存
+            bool checkState = chkVoice.Checked;
+
+            // 音声認識無効へ
+            KeVoiceOnOff(false);
+
+            FormSettings frm = new FormSettings();
+
+            frm.txtWaitAfterTransfer.Text = appSetting.waitAfterTransfer.ToString();
+            frm.txtKeName.Text = appSetting.keName;
+
+            if( frm.ShowDialog() == DialogResult.OK )
+            {
+                int.TryParse(frm.txtWaitAfterTransfer.Text, out appSetting.waitAfterTransfer);
+                appSetting.keName = frm.txtKeName.Text;
+            }
+
+            // 設定復元
+            KeVoiceOnOff(checkState);
         }
     }
 }

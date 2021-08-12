@@ -56,6 +56,7 @@ namespace KeCardWin
             this.cmbImageNo = new System.Windows.Forms.ComboBox();
             this.tabMain = new System.Windows.Forms.TabControl();
             this.tabPageMemo = new System.Windows.Forms.TabPage();
+            this.txtMemo = new KeCardWin.ExRichTextBox();
             this.cmenuEdit = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.cmenuEditCut = new System.Windows.Forms.ToolStripMenuItem();
             this.cmenuEditCopy = new System.Windows.Forms.ToolStripMenuItem();
@@ -63,14 +64,23 @@ namespace KeCardWin
             this.cmenuEditDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.cmenuEditSelectAll = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPageImage = new System.Windows.Forms.TabPage();
+            this.btnBookmark = new System.Windows.Forms.Button();
             this.picKeImage = new System.Windows.Forms.PictureBox();
-            this.txtMemo = new KeCardWin.ExRichTextBox();
+            this.menuBookmark = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuAddBookmark = new System.Windows.Forms.ToolStripMenuItem();
+            this.memuAddBookmark1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuAddBookmark2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuAddBookmark3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuReferBookmark = new System.Windows.Forms.ToolStripMenuItem();
+            this.chkVoice = new System.Windows.Forms.CheckBox();
+            this.menuSettings = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tabMain.SuspendLayout();
             this.tabPageMemo.SuspendLayout();
             this.cmenuEdit.SuspendLayout();
             this.tabPageImage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picKeImage)).BeginInit();
+            this.menuBookmark.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnCapture
@@ -107,7 +117,7 @@ namespace KeCardWin
             // 
             // barTransfer
             // 
-            this.barTransfer.Location = new System.Drawing.Point(12, 580);
+            this.barTransfer.Location = new System.Drawing.Point(12, 610);
             this.barTransfer.Name = "barTransfer";
             this.barTransfer.Size = new System.Drawing.Size(561, 31);
             this.barTransfer.TabIndex = 5;
@@ -124,7 +134,7 @@ namespace KeCardWin
             this.cmbBleAddr.FormattingEnabled = true;
             this.cmbBleAddr.Location = new System.Drawing.Point(12, 110);
             this.cmbBleAddr.Name = "cmbBleAddr";
-            this.cmbBleAddr.Size = new System.Drawing.Size(394, 32);
+            this.cmbBleAddr.Size = new System.Drawing.Size(324, 32);
             this.cmbBleAddr.TabIndex = 6;
             // 
             // tmrScan
@@ -143,7 +153,7 @@ namespace KeCardWin
             this.ヘルプHToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(588, 48);
+            this.menuStrip1.Size = new System.Drawing.Size(588, 42);
             this.menuStrip1.TabIndex = 7;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -152,7 +162,7 @@ namespace KeCardWin
             this.ファイルFToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuExit});
             this.ファイルFToolStripMenuItem.Name = "ファイルFToolStripMenuItem";
-            this.ファイルFToolStripMenuItem.Size = new System.Drawing.Size(129, 40);
+            this.ファイルFToolStripMenuItem.Size = new System.Drawing.Size(129, 38);
             this.ファイルFToolStripMenuItem.Text = "ファイル(&F)";
             // 
             // menuExit
@@ -167,9 +177,10 @@ namespace KeCardWin
             this.settingsSToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.filterToolStripMenuItem,
             this.menuDark,
-            this.menuMemo});
+            this.menuMemo,
+            this.menuSettings});
             this.settingsSToolStripMenuItem.Name = "settingsSToolStripMenuItem";
-            this.settingsSToolStripMenuItem.Size = new System.Drawing.Size(110, 40);
+            this.settingsSToolStripMenuItem.Size = new System.Drawing.Size(110, 38);
             this.settingsSToolStripMenuItem.Text = "設定(&S)";
             // 
             // filterToolStripMenuItem
@@ -179,7 +190,7 @@ namespace KeCardWin
             this.menuFilterDithering,
             this.menuFilterSketch});
             this.filterToolStripMenuItem.Name = "filterToolStripMenuItem";
-            this.filterToolStripMenuItem.Size = new System.Drawing.Size(277, 44);
+            this.filterToolStripMenuItem.Size = new System.Drawing.Size(359, 44);
             this.filterToolStripMenuItem.Text = "フィルター(&F)";
             // 
             // menuFilterOff
@@ -208,7 +219,7 @@ namespace KeCardWin
             // menuDark
             // 
             this.menuDark.Name = "menuDark";
-            this.menuDark.Size = new System.Drawing.Size(277, 44);
+            this.menuDark.Size = new System.Drawing.Size(359, 44);
             this.menuDark.Text = "濃く(&D)";
             this.menuDark.Click += new System.EventHandler(this.menuDark_Click);
             // 
@@ -219,27 +230,27 @@ namespace KeCardWin
             this.menuRuledLineDash,
             this.menuRuledLineTitle});
             this.menuMemo.Name = "menuMemo";
-            this.menuMemo.Size = new System.Drawing.Size(277, 44);
+            this.menuMemo.Size = new System.Drawing.Size(359, 44);
             this.menuMemo.Text = "メモの罫線(&L)";
             // 
             // menuRuledLineNone
             // 
             this.menuRuledLineNone.Name = "menuRuledLineNone";
-            this.menuRuledLineNone.Size = new System.Drawing.Size(248, 44);
+            this.menuRuledLineNone.Size = new System.Drawing.Size(359, 44);
             this.menuRuledLineNone.Text = "なし(&N)";
             this.menuRuledLineNone.Click += new System.EventHandler(this.menuRuledLineNone_Click);
             // 
             // menuRuledLineDash
             // 
             this.menuRuledLineDash.Name = "menuRuledLineDash";
-            this.menuRuledLineDash.Size = new System.Drawing.Size(248, 44);
+            this.menuRuledLineDash.Size = new System.Drawing.Size(359, 44);
             this.menuRuledLineDash.Text = "破線(&D)";
             this.menuRuledLineDash.Click += new System.EventHandler(this.menuRuledLineDash_Click);
             // 
             // menuRuledLineTitle
             // 
             this.menuRuledLineTitle.Name = "menuRuledLineTitle";
-            this.menuRuledLineTitle.Size = new System.Drawing.Size(248, 44);
+            this.menuRuledLineTitle.Size = new System.Drawing.Size(359, 44);
             this.menuRuledLineTitle.Text = "タイトル(&T)";
             this.menuRuledLineTitle.Click += new System.EventHandler(this.menuRuledLineTitle_Click);
             // 
@@ -248,7 +259,7 @@ namespace KeCardWin
             this.ヘルプHToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuVersionInfo});
             this.ヘルプHToolStripMenuItem.Name = "ヘルプHToolStripMenuItem";
-            this.ヘルプHToolStripMenuItem.Size = new System.Drawing.Size(124, 40);
+            this.ヘルプHToolStripMenuItem.Size = new System.Drawing.Size(124, 38);
             this.ヘルプHToolStripMenuItem.Text = "ヘルプ(&H)";
             // 
             // menuVersionInfo
@@ -262,9 +273,9 @@ namespace KeCardWin
             // 
             this.cmbImageNo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbImageNo.FormattingEnabled = true;
-            this.cmbImageNo.Location = new System.Drawing.Point(412, 110);
+            this.cmbImageNo.Location = new System.Drawing.Point(342, 110);
             this.cmbImageNo.Name = "cmbImageNo";
-            this.cmbImageNo.Size = new System.Drawing.Size(161, 32);
+            this.cmbImageNo.Size = new System.Drawing.Size(187, 32);
             this.cmbImageNo.TabIndex = 8;
             this.cmbImageNo.SelectedIndexChanged += new System.EventHandler(this.cmbImageNo_SelectedIndexChanged);
             // 
@@ -275,7 +286,7 @@ namespace KeCardWin
             this.tabMain.Location = new System.Drawing.Point(12, 157);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(561, 417);
+            this.tabMain.Size = new System.Drawing.Size(561, 447);
             this.tabMain.TabIndex = 10;
             this.tabMain.SelectedIndexChanged += new System.EventHandler(this.tabMain_SelectedIndexChanged);
             // 
@@ -285,10 +296,22 @@ namespace KeCardWin
             this.tabPageMemo.Location = new System.Drawing.Point(8, 39);
             this.tabPageMemo.Name = "tabPageMemo";
             this.tabPageMemo.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageMemo.Size = new System.Drawing.Size(545, 370);
+            this.tabPageMemo.Size = new System.Drawing.Size(545, 400);
             this.tabPageMemo.TabIndex = 0;
             this.tabPageMemo.Text = "メモ";
             this.tabPageMemo.UseVisualStyleBackColor = true;
+            // 
+            // txtMemo
+            // 
+            this.txtMemo.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtMemo.ContextMenuStrip = this.cmenuEdit;
+            this.txtMemo.Font = new System.Drawing.Font("MS UI Gothic", 13.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.txtMemo.Location = new System.Drawing.Point(8, 9);
+            this.txtMemo.Name = "txtMemo";
+            this.txtMemo.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+            this.txtMemo.Size = new System.Drawing.Size(528, 352);
+            this.txtMemo.TabIndex = 17;
+            this.txtMemo.Text = "";
             // 
             // cmenuEdit
             // 
@@ -340,42 +363,110 @@ namespace KeCardWin
             // 
             // tabPageImage
             // 
+            this.tabPageImage.Controls.Add(this.btnBookmark);
             this.tabPageImage.Controls.Add(this.picKeImage);
             this.tabPageImage.Location = new System.Drawing.Point(8, 39);
             this.tabPageImage.Name = "tabPageImage";
             this.tabPageImage.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageImage.Size = new System.Drawing.Size(545, 370);
+            this.tabPageImage.Size = new System.Drawing.Size(545, 400);
             this.tabPageImage.TabIndex = 1;
             this.tabPageImage.Text = "イメージ";
             this.tabPageImage.UseVisualStyleBackColor = true;
             // 
+            // btnBookmark
+            // 
+            this.btnBookmark.Image = ((System.Drawing.Image)(resources.GetObject("btnBookmark.Image")));
+            this.btnBookmark.Location = new System.Drawing.Point(11, 6);
+            this.btnBookmark.Name = "btnBookmark";
+            this.btnBookmark.Size = new System.Drawing.Size(44, 30);
+            this.btnBookmark.TabIndex = 14;
+            this.btnBookmark.UseVisualStyleBackColor = true;
+            this.btnBookmark.Click += new System.EventHandler(this.btnBookmark_Click);
+            // 
             // picKeImage
             // 
             this.picKeImage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.picKeImage.Location = new System.Drawing.Point(8, 9);
+            this.picKeImage.Location = new System.Drawing.Point(11, 42);
             this.picKeImage.Name = "picKeImage";
             this.picKeImage.Size = new System.Drawing.Size(528, 352);
             this.picKeImage.TabIndex = 13;
             this.picKeImage.TabStop = false;
+            this.picKeImage.DragDrop += new System.Windows.Forms.DragEventHandler(this.picKeImage_DragDrop);
+            this.picKeImage.DragEnter += new System.Windows.Forms.DragEventHandler(this.picKeImage_DragEnter);
             // 
-            // txtMemo
+            // menuBookmark
             // 
-            this.txtMemo.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtMemo.ContextMenuStrip = this.cmenuEdit;
-            this.txtMemo.Font = new System.Drawing.Font("MS UI Gothic", 13.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.txtMemo.Location = new System.Drawing.Point(8, 9);
-            this.txtMemo.Name = "txtMemo";
-            this.txtMemo.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.txtMemo.Size = new System.Drawing.Size(528, 352);
-            this.txtMemo.TabIndex = 17;
-            this.txtMemo.Text = "";
+            this.menuBookmark.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this.menuBookmark.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuAddBookmark,
+            this.menuReferBookmark});
+            this.menuBookmark.Name = "menuBookmark";
+            this.menuBookmark.Size = new System.Drawing.Size(261, 80);
+            // 
+            // menuAddBookmark
+            // 
+            this.menuAddBookmark.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.memuAddBookmark1,
+            this.menuAddBookmark2,
+            this.menuAddBookmark3});
+            this.menuAddBookmark.Name = "menuAddBookmark";
+            this.menuAddBookmark.Size = new System.Drawing.Size(260, 38);
+            this.menuAddBookmark.Text = "お気に入りへ登録";
+            // 
+            // memuAddBookmark1
+            // 
+            this.memuAddBookmark1.Name = "memuAddBookmark1";
+            this.memuAddBookmark1.Size = new System.Drawing.Size(342, 44);
+            this.memuAddBookmark1.Text = "お気に入り１に登録";
+            this.memuAddBookmark1.Click += new System.EventHandler(this.memuAddBookmark1_Click);
+            // 
+            // menuAddBookmark2
+            // 
+            this.menuAddBookmark2.Name = "menuAddBookmark2";
+            this.menuAddBookmark2.Size = new System.Drawing.Size(342, 44);
+            this.menuAddBookmark2.Text = "お気に入り２に登録";
+            this.menuAddBookmark2.Click += new System.EventHandler(this.menuAddBookmark2_Click);
+            // 
+            // menuAddBookmark3
+            // 
+            this.menuAddBookmark3.Name = "menuAddBookmark3";
+            this.menuAddBookmark3.Size = new System.Drawing.Size(342, 44);
+            this.menuAddBookmark3.Text = "お気に入り３に登録";
+            this.menuAddBookmark3.Click += new System.EventHandler(this.menuAddBookmark3_Click);
+            // 
+            // menuReferBookmark
+            // 
+            this.menuReferBookmark.Name = "menuReferBookmark";
+            this.menuReferBookmark.Size = new System.Drawing.Size(260, 38);
+            this.menuReferBookmark.Text = "お気に入りを編集";
+            this.menuReferBookmark.Click += new System.EventHandler(this.menuReferBookmark_Click);
+            // 
+            // chkVoice
+            // 
+            this.chkVoice.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkVoice.AutoSize = true;
+            this.chkVoice.Image = ((System.Drawing.Image)(resources.GetObject("chkVoice.Image")));
+            this.chkVoice.Location = new System.Drawing.Point(535, 110);
+            this.chkVoice.Name = "chkVoice";
+            this.chkVoice.Size = new System.Drawing.Size(38, 38);
+            this.chkVoice.TabIndex = 12;
+            this.chkVoice.UseVisualStyleBackColor = true;
+            this.chkVoice.CheckedChanged += new System.EventHandler(this.chkVoice_CheckedChanged);
+            // 
+            // menuSettings
+            // 
+            this.menuSettings.Name = "menuSettings";
+            this.menuSettings.Size = new System.Drawing.Size(359, 44);
+            this.menuSettings.Text = "設定(&S)";
+            this.menuSettings.Click += new System.EventHandler(this.menuSettings_Click);
             // 
             // FormMain
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(588, 619);
+            this.ClientSize = new System.Drawing.Size(588, 651);
+            this.Controls.Add(this.chkVoice);
             this.Controls.Add(this.tabMain);
             this.Controls.Add(this.cmbImageNo);
             this.Controls.Add(this.cmbBleAddr);
@@ -399,6 +490,7 @@ namespace KeCardWin
             this.cmenuEdit.ResumeLayout(false);
             this.tabPageImage.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.picKeImage)).EndInit();
+            this.menuBookmark.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -424,10 +516,8 @@ namespace KeCardWin
         private System.Windows.Forms.ToolStripMenuItem menuDark;
         private System.Windows.Forms.ToolStripMenuItem menuMemo;
         private System.Windows.Forms.TabControl tabMain;
-        private System.Windows.Forms.TabPage tabPageMemo;
         private System.Windows.Forms.TabPage tabPageImage;
         private System.Windows.Forms.PictureBox picKeImage;
-        private ExRichTextBox txtMemo;
         private System.Windows.Forms.ToolStripMenuItem menuRuledLineNone;
         private System.Windows.Forms.ToolStripMenuItem menuRuledLineDash;
         private System.Windows.Forms.ToolStripMenuItem menuRuledLineTitle;
@@ -439,6 +529,17 @@ namespace KeCardWin
         private System.Windows.Forms.ToolStripMenuItem cmenuEditSelectAll;
         private System.Windows.Forms.ToolStripMenuItem ヘルプHToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem menuVersionInfo;
+        private System.Windows.Forms.TabPage tabPageMemo;
+        private ExRichTextBox txtMemo;
+        private System.Windows.Forms.Button btnBookmark;
+        private System.Windows.Forms.ContextMenuStrip menuBookmark;
+        private System.Windows.Forms.ToolStripMenuItem menuAddBookmark;
+        private System.Windows.Forms.ToolStripMenuItem memuAddBookmark1;
+        private System.Windows.Forms.ToolStripMenuItem menuAddBookmark2;
+        private System.Windows.Forms.ToolStripMenuItem menuAddBookmark3;
+        private System.Windows.Forms.ToolStripMenuItem menuReferBookmark;
+        private System.Windows.Forms.CheckBox chkVoice;
+        private System.Windows.Forms.ToolStripMenuItem menuSettings;
     }
 }
 

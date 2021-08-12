@@ -24,7 +24,7 @@ namespace KeCardWin
         private Bitmap displayBitmap;   // ディスプレイ表示用の画像
         private Bitmap backupBitmap;    // 退避用の画像
 
-        Rectangle selectedRect;         // 選択範囲
+        public Rectangle selectedRect;         // 選択範囲
 
         public SelectedScreen selectedScreen;   // デリゲート 選択時に通知
 

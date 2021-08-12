@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.IO;
 
 namespace KeCardWin
 {
@@ -29,6 +30,25 @@ namespace KeCardWin
             }
             catch { }
 
+            return null;
+        }
+
+        // ファイルからビットマップの読み込み
+        static public Bitmap LoadImage(string filePath)
+        {
+            try
+            {
+                FileStream fs;
+                fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                Bitmap _bmp = (Bitmap)System.Drawing.Bitmap.FromStream(fs);
+                fs.Close();
+
+                Bitmap bitmap = new Bitmap(_bmp);
+
+                return bitmap;
+
+            }
+            catch { }
             return null;
         }
 

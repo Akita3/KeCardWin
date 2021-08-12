@@ -15,19 +15,12 @@ namespace KeCardWin
     {
 
         // キャプチャー
-        static public Bitmap Capture(FormMain form)
+        static public Bitmap Capture(FormMain form, Rectangle rect)
         {
             try
             {
-                // スクリーンを判別
-                // Screen screen = Screen.FromControl(form);
-                Screen screen = Screen.PrimaryScreen;
-
-                // 範囲
-                Rectangle rect = screen.Bounds;
-
                 // プライマリスクリーン全体
-                Bitmap bitmap = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
+                Bitmap bitmap = new Bitmap(rect.Width, rect.Height);
 
                 Graphics graphics = Graphics.FromImage(bitmap);
                 // 画面全体をコピーする
@@ -40,6 +33,22 @@ namespace KeCardWin
             catch{ }
 
             return null;
+        }
+
+
+        // キャプチャー
+        static public Bitmap Capture(FormMain form)
+        {
+            // スクリーンを判別
+            // Screen screen = Screen.FromControl(form);
+            Screen screen = Screen.PrimaryScreen;
+
+            // 範囲
+            Rectangle rect = screen.Bounds;
+
+            Bitmap bitmap = Capture(form, screen.Bounds);
+
+            return bitmap;
         }
 
 

@@ -16,8 +16,8 @@ namespace KeCardWin
         // メンバ
         static KeBle keBle = new KeBle();
 
-        static bool dontScanFlag = false;       // スキャン禁止フラグ
-        public static double txProgress = 0.0;  // 進捗状況
+        static bool dontScanFlag = false;           // スキャン禁止フラグ
+        public static double txProgress = 0.0;      // 進捗状況
 
         // 進捗用の定数
         const double TX_PROGRESS_START = 0.0;
@@ -28,7 +28,7 @@ namespace KeCardWin
         const double TX_PROGRESS_FINISHED = 1.0;
 
         // データ送信シーケンス
-        static public async Task<bool> DataTransmissionSequence(ulong addr , Bitmap image , byte no)
+        static public async Task<bool> DataTransmissionSequence(ulong addr , Bitmap image , byte no , int waitAfterTransfer = 0)
         {
             bool res = false;
 
@@ -66,6 +66,7 @@ namespace KeCardWin
 
                     byte[] data = keImage.GetSendPacket();
                     await keBle.SendImageData(data);
+                    if(waitAfterTransfer != 0) await Task.Delay(waitAfterTransfer);
                     txProgress = TX_PROGRESS_TX_START + (TX_PROGRESS_FINISHED - TX_PROGRESS_TX_START) * i / sendNoMax;
                 }
             }
