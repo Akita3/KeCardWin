@@ -30,3 +30,11 @@ Microsoft.Windows.SDK.Contracts 10.0.19041.1
 superfastblur (https://github.com/mdymel/superfastblur)
 ```
 
+## バージョン
+```
+1.0.0.0 新規作成
+1.0.1.0 細かいバグを修正
+1.1.0.0 音声認識機能追加
+```
+
+
