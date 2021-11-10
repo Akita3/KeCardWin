@@ -61,26 +61,75 @@
     <Compile Include="AboutBoxMain.Designer.cs">
       <DependentUpon>AboutBoxMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="ApEvents.cs" />
     <Compile Include="AppSetting.cs" />
-    <Compile Include="Bookmark.cs" />
-    <Compile Include="Bookmarks.cs" />
+    <Compile Include="Cmd.cs" />
+    <Compile Include="CtrlButtonEvent.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CtrlButtonEvent.Designer.cs">
+      <DependentUpon>CtrlButtonEvent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CtrlEvent.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CtrlEvent.Designer.cs">
+      <DependentUpon>CtrlEvent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CtrlInitEvent.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CtrlInitEvent.Designer.cs">
+      <DependentUpon>CtrlInitEvent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CtrlPcEvent.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CtrlPcEvent.Designer.cs">
+      <DependentUpon>CtrlPcEvent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CtrlTimerEvent.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CtrlTimerEvent.Designer.cs">
+      <DependentUpon>CtrlTimerEvent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CtrlVoiceEvent.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CtrlVoiceEvent.Designer.cs">
+      <DependentUpon>CtrlVoiceEvent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ApEvent.cs" />
     <Compile Include="ExRichTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ExRichTextBox.Designer.cs">
       <DependentUpon>ExRichTextBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormBookmark.cs">
+    <Compile Include="FormEvents.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FormBookmark.Designer.cs">
-      <DependentUpon>FormBookmark.cs</DependentUpon>
+    <Compile Include="FormEvents.Designer.cs">
+      <DependentUpon>FormEvents.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormEventSelect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormEventSelect.Designer.cs">
+      <DependentUpon>FormEventSelect.cs</DependentUpon>
     </Compile>
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormNotification.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormNotification.Designer.cs">
+      <DependentUpon>FormNotification.cs</DependentUpon>
     </Compile>
     <Compile Include="FormScreen.cs">
       <SubType>Form</SubType>
@@ -94,39 +143,68 @@
     <Compile Include="FormSettings.Designer.cs">
       <DependentUpon>FormSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormTest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormTest.Designer.cs">
+      <DependentUpon>FormTest.cs</DependentUpon>
+    </Compile>
     <Compile Include="GaussianBlur.cs" />
     <Compile Include="GrayImg.cs" />
     <Compile Include="ImgLib.cs" />
     <Compile Include="KeBle.cs" />
     <Compile Include="KeCtrl.cs" />
+    <Compile Include="KeEvent.cs" />
     <Compile Include="KeImage.cs" />
     <Compile Include="KeVoiceCmd.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Runbook.cs" />
     <Compile Include="ScCap.cs" />
-    <Compile Include="BookmarkCtrl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="BookmarkCtrl.Designer.cs">
-      <DependentUpon>BookmarkCtrl.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="AboutBoxMain.resx">
       <DependentUpon>AboutBoxMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CtrlButtonEvent.resx">
+      <DependentUpon>CtrlButtonEvent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CtrlEvent.resx">
+      <DependentUpon>CtrlEvent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CtrlInitEvent.resx">
+      <DependentUpon>CtrlInitEvent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CtrlPcEvent.resx">
+      <DependentUpon>CtrlPcEvent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CtrlTimerEvent.resx">
+      <DependentUpon>CtrlTimerEvent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CtrlVoiceEvent.resx">
+      <DependentUpon>CtrlVoiceEvent.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ExRichTextBox.resx">
       <DependentUpon>ExRichTextBox.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FormBookmark.resx">
-      <DependentUpon>FormBookmark.cs</DependentUpon>
+    <EmbeddedResource Include="FormEvents.resx">
+      <DependentUpon>FormEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormEventSelect.resx">
+      <DependentUpon>FormEventSelect.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormNotification.resx">
+      <DependentUpon>FormNotification.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormScreen.resx">
       <DependentUpon>FormScreen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormSettings.resx">
       <DependentUpon>FormSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormTest.resx">
+      <DependentUpon>FormTest.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -136,10 +214,8 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="BookmarkCtrl.resx">
-      <DependentUpon>BookmarkCtrl.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -164,6 +240,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="app.ico" />
+    <Content Include="Resources\arrow_right.png" />
+    <Content Include="Resources\circle.png" />
+    <None Include="res\baseline_subdirectory_arrow_right_black_24dp.png" />
+    <None Include="res\baseline_radio_button_unchecked_black_24dp.png" />
+    <None Include="Resources\SAMPLE_IMAGE.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

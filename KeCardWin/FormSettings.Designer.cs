@@ -40,8 +40,10 @@ namespace KeCardWin
             this.chkTest = new System.Windows.Forms.CheckBox();
             this.txtTestLog = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.txtWaitAfterTransfer = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.txtWaitAfterTransfer = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txtPacketSize = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -148,7 +150,9 @@ namespace KeCardWin
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label4);
             this.groupBox3.Controls.Add(this.label3);
+            this.groupBox3.Controls.Add(this.txtPacketSize);
             this.groupBox3.Controls.Add(this.txtWaitAfterTransfer);
             this.groupBox3.Location = new System.Drawing.Point(12, 12);
             this.groupBox3.Name = "groupBox3";
@@ -156,14 +160,6 @@ namespace KeCardWin
             this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "無線送信";
-            // 
-            // txtWaitAfterTransfer
-            // 
-            this.txtWaitAfterTransfer.Location = new System.Drawing.Point(286, 34);
-            this.txtWaitAfterTransfer.Name = "txtWaitAfterTransfer";
-            this.txtWaitAfterTransfer.Size = new System.Drawing.Size(240, 31);
-            this.txtWaitAfterTransfer.TabIndex = 2;
-            this.txtWaitAfterTransfer.Text = "0";
             // 
             // label3
             // 
@@ -174,11 +170,36 @@ namespace KeCardWin
             this.label3.TabIndex = 2;
             this.label3.Text = "データ送信後のWait[ms]：";
             // 
+            // txtWaitAfterTransfer
+            // 
+            this.txtWaitAfterTransfer.Location = new System.Drawing.Point(286, 34);
+            this.txtWaitAfterTransfer.Name = "txtWaitAfterTransfer";
+            this.txtWaitAfterTransfer.Size = new System.Drawing.Size(168, 31);
+            this.txtWaitAfterTransfer.TabIndex = 2;
+            this.txtWaitAfterTransfer.Text = "0";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(501, 37);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(255, 24);
+            this.label4.TabIndex = 2;
+            this.label4.Text = "パケットサイズ(16の倍数)：";
+            // 
+            // txtPacketSize
+            // 
+            this.txtPacketSize.Location = new System.Drawing.Point(762, 34);
+            this.txtPacketSize.Name = "txtPacketSize";
+            this.txtPacketSize.Size = new System.Drawing.Size(187, 31);
+            this.txtPacketSize.TabIndex = 2;
+            this.txtPacketSize.Text = "128";
+            // 
             // FormSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(994, 544);
+            this.ClientSize = new System.Drawing.Size(994, 535);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.btnCancel);
@@ -216,5 +237,7 @@ namespace KeCardWin
         private System.Windows.Forms.GroupBox groupBox3;
         public System.Windows.Forms.TextBox txtWaitAfterTransfer;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        public System.Windows.Forms.TextBox txtPacketSize;
     }
 }

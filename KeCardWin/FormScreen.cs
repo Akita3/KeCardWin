@@ -127,7 +127,7 @@ namespace KeCardWin
 
             FormScreen_MouseMove(null, null);
 
-            if (selectedScreen != null)
+            if (selectedScreen != null && selectedRect.Width > 0 && selectedRect.Height > 0)
             {
 
                 // 描画部分をバックアップ

@@ -32,15 +32,22 @@ namespace KeCardWin
         public const int IMG_BYTE_N = IMG_WIDTH * IMG_HEIGHT * IMG_BIT_N / 8;
 
         // 1パケットのデータ量
-        public const int DATA_SIZE_LOW_SPEED = 16;
         public const int DATA_SIZE_HIGH_SPEED = 128;
 
         // 送信データサイズ
-        public int sendDataSize = DATA_SIZE_HIGH_SPEED;
+        public static int sendDataSize = DATA_SIZE_HIGH_SPEED;
 
         // 送信イメージ、送信番号
         private byte[] sendingImage;
         private int sendingNo = 0;
+
+        // 画像フィルター
+        public enum IMG_FILTER
+        {
+            NONE = 0,
+            DITHERING,
+            SKETCH,
+        };
 
 
         // イメージサイズにフィット
@@ -113,6 +120,43 @@ namespace KeCardWin
             }
 
             return dstImage;
+        }
+
+        // カラー→2bitグレースケール
+        static public Bitmap ImageToGray2bitImage(Bitmap image , IMG_FILTER filter , bool darkMode )
+        {
+            Bitmap calcImage;
+            // 濃いめ？
+            if (darkMode)
+            {
+                calcImage = ImgLib.Darken(image, 64);
+            }
+            else
+            {
+                calcImage = (Bitmap)image.Clone();
+            }
+
+            Bitmap resImage;
+            // フィルター
+            switch (filter)
+            {
+                default:
+                case IMG_FILTER.NONE:
+                    resImage = KeImage.ImageToGray2bitImageNormal(calcImage);
+                    break;
+                case IMG_FILTER.DITHERING:
+                    resImage = KeImage.ImageToGray2bitImageDithering(calcImage);
+                    break;
+                case IMG_FILTER.SKETCH:
+                    var sketchImg = KeImage.NormalSketch(calcImage);
+                    var th1 = 64 + 64;
+                    var th2 = 160 + 32;
+                    var th3 = 224;
+                    resImage = KeImage.ImageToGray2bitImageNormal(sketchImg, th1, th2, th3);
+                    break;
+            }
+
+            return resImage;
         }
 
         // カラー→2bitグレースケールへ変換 (通常)
@@ -249,7 +293,7 @@ namespace KeCardWin
         }
 
         // ビットマップ→2bitグレースケールデータ列 変換
-        byte[] BitmapToGray2bit(Bitmap image)
+        byte[] BitmapToGray2bitData(Bitmap image)
         {
 
             // Nullチェック
@@ -303,7 +347,7 @@ namespace KeCardWin
         public bool SetImage(Bitmap image)
         {
 
-            sendingImage = BitmapToGray2bit(image);
+            sendingImage = BitmapToGray2bitData(image);
 
             if (sendingImage == null) return false;
             if (sendingImage.Length <= 0) return false;

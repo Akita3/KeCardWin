@@ -8,78 +8,59 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using QRCoder;
+using Microsoft.Win32;
 
 namespace KeCardWin
 {
     // クラス：FormMain
     public partial class FormMain : Form
     {
+        static public FormMain mFormMain;
+
         // アプリケーション設定
-        AppSetting appSetting = new AppSetting();
+        public static AppSetting appSetting = new AppSetting();
+
+        // ApEvent
+        ApEvents apEventsSetting = new ApEvents();
 
         // スクリーン用フォーム
         FormScreen formScreen;
+
+        // ボタン押し通知用フォーム
+        FormNotification formNotification;
+
 
         // イメージ
         Bitmap baseImage;   // フィルター前のイメージ
         Bitmap keImage;     // フィルター後のイメージ
 
         // BLEアドレス
-        ulong bleAddr;
+        public ulong bleAddr;
 
         // スキャン結果のBLEアドレスリスト
-        List<ulong> scanBleAddrs;
+        public List<ulong> scanBleAddrs;
 
         // Tab Index 
         private const int TAB_IDX_MEMO = 0;
         private const int TAB_IDX_IMAGE = 1;
 
-        // ブックマーク情報
-        Bookmarks bookmarks = new Bookmarks();
-        Bookmark bookmarkTemp = new Bookmark();
-
         // ボイスコマンド
         KeVoiceCmd keVoiceCmd = null;
 
+
+        // BLEアドレス更新
+        DelegateFormEventsUpdateBleAddr delegateFormEventsUpdateBle = null;
+        DelegateFormEventsTimerProgress delegateFormEventsTimerProgress = null;
 
         // 転送用イメージ設定
         void SetKeImage(Bitmap srcBmp)
         {
             if (srcBmp == null) return;
 
-
             // ベース画像を保存
             baseImage = (Bitmap)srcBmp.Clone();
 
-
-            Bitmap calcImage;
-            // 濃いめ？
-            if ( appSetting.darkMode )
-            {
-                calcImage = ImgLib.Darken(baseImage, 64);
-            } else
-            {
-                calcImage = (Bitmap)baseImage.Clone();
-            }
-
-
-            switch (appSetting.imgFilter)
-            {
-                default:
-                case AppSetting.IMG_FILTER.NONE:
-                    keImage = KeImage.ImageToGray2bitImageNormal(calcImage);
-                    break;
-                case AppSetting.IMG_FILTER.DITHERING:
-                    keImage = KeImage.ImageToGray2bitImageDithering(calcImage);
-                    break;
-                case AppSetting.IMG_FILTER.SKETCH:
-                    var sketchImg = KeImage.NormalSketch(calcImage);
-                    var th1 = 64 + 64;
-                    var th2 = 160 + 32;
-                    var th3 = 224;
-                    keImage = KeImage.ImageToGray2bitImageNormal(sketchImg,th1 , th2 , th3);
-                    break;
-            }
+            keImage = KeImage.ImageToGray2bitImage(baseImage, appSetting.imgFilter, appSetting.darkMode);
 
             picKeImage.BackgroundImage = (Bitmap)keImage.Clone();
 
@@ -89,43 +70,38 @@ namespace KeCardWin
         // スクリーンが選択された
         private void FormScreen_SelectedScreen(Bitmap scBitmap)
         {
-            btnCancel.Enabled = false;
             formScreen.Hide();
+            btnCapture.Text = "スクリーンキャプチャ";
+
+            tabMain.SelectedIndex = TAB_IDX_IMAGE;
 
             SetKeImage(scBitmap);
-
-            bookmarkTemp.rect = formScreen.selectedRect;
-            bookmarkTemp.bitmap = KeImage.FitImageSize(scBitmap);
         }
 
         // コンボボックスのBLEアドレス更新
         private void UpdateCmbBleAddr()
         {
-            cmbBleAddr.Items.Clear();
-
-            int selectIndex = -1;
-
-            for(int i = 0; i < scanBleAddrs.Count; i ++ )
+            foreach( ulong addr in scanBleAddrs )
             {
-                cmbBleAddr.Items.Add(KeBle.BleAddrToString(scanBleAddrs[i]));
-                if (bleAddr == scanBleAddrs[i]) selectIndex = i;
-            }
+                string text = KeBle.BleAddrToString(addr);
 
-            if (selectIndex >= 0)
-            {
-                cmbBleAddr.SelectedIndex = selectIndex;
-            } else
-            {
-                if(scanBleAddrs.Count > 0)
+                int index = cmbBleAddr.Items.IndexOf(text);
+                if (index < 0)
                 {
-                    cmbBleAddr.SelectedIndex = 0;
-                    bleAddr = scanBleAddrs[0];
-                } else
-                {
-                    bleAddr = 0x0;
+                    cmbBleAddr.Items.Add(text);
+
+                    if (cmbBleAddr.SelectedIndex < 0)
+                    {
+                        cmbBleAddr.SelectedIndex = 0;
+                        bleAddr = addr;
+
+                        if(delegateFormEventsUpdateBle != null )
+                        {
+                            delegateFormEventsUpdateBle(bleAddr);
+                        }
+                    }
                 }
             }
-
         }
 
         // SlotNoコンボボックス初期化
@@ -138,11 +114,39 @@ namespace KeCardWin
             cmbImageNo.SelectedIndex = appSetting.imageNo;
         }
 
-        // メニューフィルターをチェック
-        public void CheckMenuFilter(AppSetting.IMG_FILTER filter)
+        private void CtrlUpdate(KeCtrl.WORK_MODE mode)
         {
-            menuFilterOff.Checked = (filter == AppSetting.IMG_FILTER.NONE);
-            menuFilterDithering.Checked = (filter == AppSetting.IMG_FILTER.DITHERING);
+            bool enabled = false;
+            if( mode == KeCtrl.WORK_MODE.IMAGE_TX 
+                || mode == KeCtrl.WORK_MODE.EVENT_TX
+                || mode == KeCtrl.WORK_MODE.BLE_CONN_FAST_CHANGING
+                || mode == KeCtrl.WORK_MODE.BLE_CONN_SLOW_CHANGING
+                || mode == KeCtrl.WORK_MODE.BLE_SCAN_CHANGING
+                || mode == KeCtrl.WORK_MODE.IDLE_CHANGING )
+            {
+                enabled = false;
+            }
+            else
+            {
+                enabled = true;
+            }
+            // コントロール無効化
+            btnTransfer.Enabled = enabled;
+            btnCapture.Enabled = enabled;
+            tabMain.Enabled = enabled;
+            cmbBleAddr.Enabled = enabled;
+            cmbImageNo.Enabled = enabled;
+            btnEditEvent.Enabled = enabled;
+            btnBleSlowConnect.Enabled = enabled;
+            menuTest.Enabled = enabled;
+        }
+
+
+        // メニューフィルターをチェック
+        public void CheckMenuFilter(KeImage.IMG_FILTER filter)
+        {
+            menuFilterOff.Checked = (filter == KeImage.IMG_FILTER.NONE);
+            menuFilterDithering.Checked = (filter == KeImage.IMG_FILTER.DITHERING);
 
         }
 
@@ -150,6 +154,11 @@ namespace KeCardWin
         public FormMain()
         {
             InitializeComponent();
+            FormMain.mFormMain = this;
+
+            //スリープ・休止状態をOSから通知してもらう
+            SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(Detect_SleepWakeup);
+
         }
 
         // Form Load
@@ -158,13 +167,15 @@ namespace KeCardWin
             formScreen = new FormScreen();
             formScreen.selectedScreen += FormScreen_SelectedScreen;
 
+            formNotification = new FormNotification();
+
             picKeImage.AllowDrop = true;
 
             // AppSetting.saveSettings(appSetting, "AppSettings.xml");
             appSetting = AppSetting.LoadSettings("AppSettings.xml");
 
-            // ブックマーク読み込み
-            bookmarks = appSetting.GetBookmarks();
+            // ApEvents読み込み
+            apEventsSetting = ApEventsLib.DeserializeObject();
 
             // メニューを設定
             CheckMenuFilter(appSetting.imgFilter);
@@ -182,27 +193,45 @@ namespace KeCardWin
             Bitmap bitmap = AppSetting.LoadBitmap(appSetting.backupImageName);
             SetKeImage(bitmap);
 
+            // 転送データサイズの設定
+            KeImage.sendDataSize = appSetting.transferPacketSize;
+
+            // ボタン押し通知のデリゲート登録
+            KeCtrl.keBle.delegateKeBleRecieveMsg += BleRecieveMsg;
+
+            // 動作モード
+            txtWorkMode.Text = KeCtrl.WORK_MODE_STR[(int)KeCtrl.workMode];
+
         }
 
         // キャプチャボタンクリック
         private void btnCapture_Click(object sender, EventArgs e)
         {
-            btnCancel.Enabled = true;
+            if(formScreen.Visible == false)
+            {
+                btnCapture.Text = "キャンセル";
 
-            Bitmap bitmap = ScCap.Capture(this);
-            this.TopMost = true;
-            formScreen.SetScreenImage(bitmap);
-            formScreen.Show();
+                Bitmap bitmap = ScCap.Capture(this);
+                this.TopMost = true;
+                this.TopMost = false;
+                formScreen.SetScreenImage(bitmap);
+                formScreen.Show();
 
-            // AppSetting.SaveBitmap(bitmap, "Screen.bmp");
+                // AppSetting.SaveBitmap(bitmap, "Screen.bmp");
+            }
+            else
+            {
+                btnCapture.Text = "スクリーンキャプチャ";
+
+                formScreen.Hide();
+            }
+
 
         }
 
         // (キャプチャ)キャンセルボタンクリック
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            formScreen.Hide();
-            btnCancel.Enabled = false;
 
         }
 
@@ -276,26 +305,37 @@ namespace KeCardWin
             }
             if (transferImage == null) return;
 
-            // コントロール無効化
-            btnCapture.Enabled = false;
-            tabMain.Enabled = false;
-            cmbBleAddr.Enabled = false;
-            cmbImageNo.Enabled = false;
+            // 動作モード表示変更
+            txtWorkMode.Text = KeCtrl.WORK_MODE_STR[(int)KeCtrl.WORK_MODE.IMAGE_TX];
+
+            // コントロール更新
+            CtrlUpdate(KeCtrl.WORK_MODE.EVENT_TX);
+
+            // 低速接続とスキャンのみ許可
+            if (KeCtrl.workMode != KeCtrl.WORK_MODE.IDLE
+                && KeCtrl.workMode != KeCtrl.WORK_MODE.BLE_CONN_SLOW
+                && KeCtrl.workMode != KeCtrl.WORK_MODE.BLE_SCAN)
+            {
+                return;
+            }
 
             // イメージ転送シーケンス
-            await KeCtrl.DataTransmissionSequence(bleAddr
+            await KeCtrl.ImageTransmissionSequence(bleAddr
                                                 , transferImage
                                                 , appSetting.imageNo
                                                 , appSetting.waitAfterTransfer);
 
+            // 遷移前の状態(スキャンモード)へ復帰
+            await KeCtrl .SetScanMode();
+
             // コントロール有効化
-            btnCapture.Enabled = tabMain.SelectedIndex == TAB_IDX_IMAGE ? true : false;
-            tabMain.Enabled = true;
-            cmbBleAddr.Enabled = true;
-            cmbImageNo.Enabled = true;
+            CtrlUpdate(KeCtrl.workMode);
 
             // 転送イメージを保存
             AppSetting.SaveBitmap(transferImage, appSetting.transferImageName);
+
+            // 動作モード表示変更
+            txtWorkMode.Text = KeCtrl.WORK_MODE_STR[(int)KeCtrl.workMode];
 
         }
 
@@ -303,6 +343,10 @@ namespace KeCardWin
         private void tmrProgress_Tick(object sender, EventArgs e)
         {
             barTransfer.Value = (int)(KeCtrl.txProgress * 100);
+            if(delegateFormEventsTimerProgress != null)
+            {
+                delegateFormEventsTimerProgress();
+            }
         }
 
         // スキャン用タイマー定期処理
@@ -331,7 +375,7 @@ namespace KeCardWin
         // メニュー：フィルターOFF
         private void menuFilterOff_Click(object sender, EventArgs e)
         {
-            appSetting.imgFilter = AppSetting.IMG_FILTER.NONE;
+            appSetting.imgFilter = KeImage.IMG_FILTER.NONE;
             CheckMenuFilter(appSetting.imgFilter);
             SetKeImage(baseImage);
         }
@@ -339,7 +383,7 @@ namespace KeCardWin
         // メニュー：フィルターディザリング
         private void menuFilterDithering_Click(object sender, EventArgs e)
         {
-            appSetting.imgFilter = AppSetting.IMG_FILTER.DITHERING;
+            appSetting.imgFilter = KeImage.IMG_FILTER.DITHERING;
             CheckMenuFilter(appSetting.imgFilter);
             SetKeImage(baseImage);
         }
@@ -347,7 +391,7 @@ namespace KeCardWin
         // メニュー：フィルタースケッチ風
         private void menuFilterSketch_Click(object sender, EventArgs e)
         {
-            appSetting.imgFilter = AppSetting.IMG_FILTER.SKETCH;
+            appSetting.imgFilter = KeImage.IMG_FILTER.SKETCH;
             CheckMenuFilter(appSetting.imgFilter);
             SetKeImage(baseImage);
         }
@@ -380,7 +424,6 @@ namespace KeCardWin
         // Mainタブ 選択変更イベントハンドラ
         private void tabMain_SelectedIndexChanged(object sender, EventArgs e)
         {
-            btnCapture.Enabled = (tabMain.SelectedIndex == TAB_IDX_IMAGE ? true : false);
         }
 
         // メニュー：罫線なし
@@ -455,79 +498,32 @@ namespace KeCardWin
             aboutBoxMain.ShowDialog();
         }
 
-        private void btnBookmark_Click(object sender, EventArgs e)
-        {
-            menuBookmark.Show(tabPageImage, new Point(btnBookmark.Left + btnBookmark.Width, btnBookmark.Top));
-        }
-
-        private void menuEditBookmark(Bookmarks b)
-        {
-            FormBookmark frm = new FormBookmark();
-            frm.bookmarks = b;
-
-            if( frm.ShowDialog() == DialogResult.OK )
-            {
-                // 今の状態を取得
-                bool voiceState = chkVoice.Checked;
-                // 強制OFF
-                KeVoiceOnOff(voiceState);
-
-                bookmarks = frm.bookmarks;
-                appSetting.SetBookmarks(bookmarks);
-                // 設定を復元
-                KeVoiceOnOff(voiceState);
-            }
-        }
-
-        private void memuAddBookmark1_Click(object sender, EventArgs e)
-        {
-            Bookmarks tmp = bookmarks.DeepCopy();
-            tmp.bookmarks[0] = bookmarkTemp.DeepCopy();
-            menuEditBookmark(tmp);
-        }
-
-        private void menuAddBookmark2_Click(object sender, EventArgs e)
-        {
-            Bookmarks tmp = bookmarks.DeepCopy();
-            tmp.bookmarks[1] = bookmarkTemp.DeepCopy();
-            menuEditBookmark(tmp);
-        }
-
-        private void menuAddBookmark3_Click(object sender, EventArgs e)
-        {
-            Bookmarks tmp = bookmarks.DeepCopy();
-            tmp.bookmarks[2] = bookmarkTemp.DeepCopy();
-            menuEditBookmark(tmp);
-        }
-
-        private void menuReferBookmark_Click(object sender, EventArgs e)
-        {
-            Bookmarks tmp = bookmarks.DeepCopy();
-            menuEditBookmark(tmp);
-        }
 
         private void KeVoiceCmdRecognized(string word)
         {
-            // キーワードから対象のブックマークを検索
-            Bookmark b = bookmarks.bookmarks.FirstOrDefault(x => x.keyword.Contains(word));
-            if (b == null) return;
+            ApEvent ap = apEventsSetting.apEvents.FirstOrDefault(x => x.eventType == ApEvent.EVENT_TYPE.VOICE && ((ApEventVoice)x).keyword.Contains(word));
+            if (ap == null) return;
 
+            ApEventVoice apEventVoice = (ApEventVoice)ap;
             Bitmap bitmap;
-            if ( b.mode == Bookmark.Mode.CAPTURE )
+            if (apEventVoice.subEventType == (int)ApEventVoice.VOICE_EVENT_TYPE.SCREEN )
             {
                 // キャプチャモード
-                bitmap = ScCap.Capture(this, b.rect);
+                bitmap = ScCap.Capture(this, apEventVoice.rect);
             }
             else
             {
                 // ファイルモード
-                bitmap = new Bitmap(b.bitmap);
+                bitmap = new Bitmap(apEventVoice.imagePath);
             }
 
             if (bitmap == null) return;
             SetKeImage(bitmap);
 
-            if( btnTransfer.Enabled == true )
+            // タブを切り替え
+            tabMain.SelectedIndex = TAB_IDX_IMAGE;
+
+            if ( btnTransfer.Enabled == true )
             {
                 btnTransfer_Click(null, null);
             }
@@ -537,13 +533,24 @@ namespace KeCardWin
 
         private void KeVoiceOnOff(bool sw)
         {
+            // ON
             if(sw)
             {
-                keVoiceCmd = new KeVoiceCmd();
-                keVoiceCmd.Open(appSetting.keName , bookmarks.GetKeywords());
-                keVoiceCmd.delegateKeVoiceCmdRecognized = KeVoiceCmdRecognized;
+                string[] keywords = apEventsSetting.GetVoiceKeywords();
+
+                if(keywords.Count() > 0)
+                {
+                    keVoiceCmd = new KeVoiceCmd();
+                    keVoiceCmd.Open(appSetting.keName, keywords);
+                    keVoiceCmd.delegateKeVoiceCmdRecognized = KeVoiceCmdRecognized;
+                } else
+                {
+                    sw = false;
+                }
             }
-            else
+
+            // OFF
+            if(!sw)
             {
                 if(keVoiceCmd != null)
                 {
@@ -551,34 +558,228 @@ namespace KeCardWin
                     keVoiceCmd = null;
                 }
             }
+
+            // 色を設定
+            btnVoice.BackColor = keVoiceCmd == null ? SystemColors.Control : SystemColors.ControlDark;
         }
 
-        private void chkVoice_CheckedChanged(object sender, EventArgs e)
-        {
-            KeVoiceOnOff(chkVoice.Checked);
-        }
 
         private void menuSettings_Click(object sender, EventArgs e)
         {
             // 設定保存
-            bool checkState = chkVoice.Checked;
+            bool checkState = keVoiceCmd == null ? false : true;
 
             // 音声認識無効へ
             KeVoiceOnOff(false);
 
             FormSettings frm = new FormSettings();
 
+
             frm.txtWaitAfterTransfer.Text = appSetting.waitAfterTransfer.ToString();
+            frm.txtPacketSize.Text = appSetting.transferPacketSize.ToString();
             frm.txtKeName.Text = appSetting.keName;
 
             if( frm.ShowDialog() == DialogResult.OK )
             {
                 int.TryParse(frm.txtWaitAfterTransfer.Text, out appSetting.waitAfterTransfer);
+                int.TryParse(frm.txtPacketSize.Text, out appSetting.transferPacketSize);
+                KeImage.sendDataSize = appSetting.transferPacketSize;
                 appSetting.keName = frm.txtKeName.Text;
             }
 
             // 設定復元
             KeVoiceOnOff(checkState);
+        }
+
+        private async void menuTest_Click(object sender, EventArgs e)
+        {
+            // 今のモードをチェック
+            if(KeCtrl.workMode != KeCtrl.WORK_MODE.BLE_SCAN)
+            {
+                MessageBox.Show("無線接続を停止してください。");
+                return;
+            }
+
+            FormTest frm = new FormTest();
+            frm.testBleAddr = bleAddr;
+
+            // デリゲート登録
+            KeCtrl.keBle.delegateKeBleRecieveMsg = frm.BleRecieveMsg;
+
+            // don't scan
+            await KeCtrl.SetIdleMode();
+
+            frm.ShowDialog();
+
+            // scan モードへ
+            await KeCtrl.SetScanMode();
+
+            // デリゲート再登録
+            KeCtrl.keBle.delegateKeBleRecieveMsg = BleRecieveMsg;
+
+        }
+
+        // パソコンがレジューム復帰した
+        private void PcResume()
+        {
+            ApEventPc apEventPc = (ApEventPc)apEventsSetting.SearchFirst(ApEvent.EVENT_TYPE.PC, (int)ApEventPc.PC_EVENT_TYPE.BOOT);
+            if (apEventPc == null) return;
+
+            // タブを切り替え
+            tabMain.SelectedIndex = TAB_IDX_IMAGE;
+
+            // イメージを読み込み
+            Bitmap bitmap = AppSetting.LoadBitmap(apEventPc.imagePath);
+            if (bitmap == null) return;
+
+            SetKeImage(bitmap);
+            btnTransfer_Click(null, null);
+
+        }
+
+
+        private void Detect_SleepWakeup(object sender, PowerModeChangedEventArgs e)
+
+        {
+
+            switch (e.Mode)
+            {
+                case PowerModes.Suspend:
+                    //オペレーティング システムが中断されます。
+                    // btnTransfer_Click(null, null);
+                    // MessageBox.Show("中断");
+                    break;
+
+                case PowerModes.Resume:
+                    PcResume();
+                    //オペレーティング システムが中断状態から再開されます。
+                    // MessageBox.Show("レジューム");
+                    // btnTransfer_Click(null, null);
+                    break;
+                case PowerModes.StatusChange:
+                    //電源モードのステータス通知がオペレーティング システムで発生しました。 
+                    //これは、バッテリ電力が低下した、バッテリの充電中、AC 電源と
+                    //バッテリの間で移行しているなど、システム電源のステータスが
+                    //  変化したことを示している可能性があります。
+                    break;
+            }
+        }
+
+        private void btnEditEvent_Click(object sender, EventArgs e)
+        {
+            // 今の状態を取得
+            bool voiceState = keVoiceCmd == null ? false : true;
+
+            FormEvents frm = new FormEvents();
+
+            // 強制OFF
+            KeVoiceOnOff(false);
+
+            delegateFormEventsUpdateBle = frm.UpdateBleAddr;
+            delegateFormEventsTimerProgress = frm.TimerProgress;
+            frm.apEventsEdit = apEventsSetting;
+            if(bleAddr != 0x00) frm.txtBleAddr.Text = KeBle.BleAddrToString(bleAddr);
+
+            var dres = frm.ShowDialog();
+
+            delegateFormEventsUpdateBle = null;
+            delegateFormEventsTimerProgress = null;
+
+            // 設定を復元
+            KeVoiceOnOff(voiceState);
+
+            if( dres == DialogResult.OK )
+            {
+                // BLE低速接続を行う場合
+                if( frm.bleConnectionNeeds )
+                {
+                    btnBleSlowConnect_Click(null, null);
+                }
+            }
+
+        }
+
+
+        public void BleRecieveMsg(byte[] data)
+        {
+            this.Invoke(new DelegateKeBleRecieveMsg(this.BleRecieveMsgSafe), data);
+        }
+
+        public void BleRecieveMsgSafe(byte[] data)
+        {
+
+            if(formNotification.IsDisposed )
+            {
+                formNotification = new FormNotification();
+            }
+
+            ApEventButton apEventButton = (ApEventButton)apEventsSetting.SearchFirst( ApEvent.EVENT_TYPE.BUTTON,(int)ApEventButton.BUTTON_EVENT_TYPE.PUSH);
+
+            if (apEventButton != null && formNotification.Visible == false )
+            {
+                formNotification.apEventButton = apEventButton;
+                formNotification.Show();
+            }
+
+        }
+
+        private async void btnBleSlowConnect_Click(object sender, EventArgs e)
+        {
+
+            if( KeCtrl.workMode == KeCtrl.WORK_MODE.BLE_CONN_SLOW)
+            {
+                // 現在低速接続中
+
+                // コントロール更新
+                CtrlUpdate(KeCtrl.WORK_MODE.BLE_SCAN_CHANGING);
+
+                // 動作モード表示変更
+                txtWorkMode.Text = KeCtrl.WORK_MODE_STR[(int)KeCtrl.WORK_MODE.BLE_SCAN_CHANGING];
+
+                // スキャン状態へ
+                await KeCtrl.SetScanMode();
+
+                btnBleSlowConnect.Text = "無線常時接続";
+
+            }
+            else if (KeCtrl.workMode == KeCtrl.WORK_MODE.BLE_SCAN)
+            {
+                // コントロール更新
+                CtrlUpdate(KeCtrl.WORK_MODE.BLE_CONN_SLOW_CHANGING);
+
+                // 動作モード表示変更
+                txtWorkMode.Text = KeCtrl.WORK_MODE_STR[(int)KeCtrl.WORK_MODE.BLE_CONN_SLOW_CHANGING];
+
+                // Idle状態へ
+                await KeCtrl.SetIdleMode();
+
+                // 低速接続
+                bool res = await KeCtrl.BleSlowConnect(bleAddr);
+                if( res )
+                {
+                    btnBleSlowConnect.Text = "無線切断";
+                } else
+                {
+                    // スキャン状態へ
+                    await KeCtrl.SetScanMode();
+                }
+
+            } else
+            {
+
+            }
+
+            // 動作モード表示変更
+            txtWorkMode.Text = KeCtrl.WORK_MODE_STR[(int)KeCtrl.workMode];
+
+            // コントロール更新
+            CtrlUpdate(KeCtrl.workMode);
+
+        }
+
+        private void btnVoice_Click(object sender, EventArgs e)
+        {
+            KeVoiceOnOff(keVoiceCmd == null ? true : false);
         }
     }
 }
