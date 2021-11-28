@@ -18,6 +18,7 @@ namespace KeCardWin
             HELLO,            // Helloコマンド
             TIMER,            // タイマー
             BUTTON,           // ボタン押下
+            RSSI,             // RSSI
             MAX,              // 最大
         };
 
@@ -29,6 +30,7 @@ namespace KeCardWin
             "Helloコマンド",
             "タイマー",
             "ボタン押下",
+            "RSSI",
         };
 
 

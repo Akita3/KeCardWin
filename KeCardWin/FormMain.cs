@@ -707,6 +707,9 @@ namespace KeCardWin
 
         public void BleRecieveMsgSafe(byte[] data)
         {
+            // サイズ、タイプをチェック
+            if (data.Length != KeRes.RES_NOTIFY_LEN) return;
+            if (data[KeRes.RES_TYPE_POS] != KeRes.RES_NOTIFY) return;
 
             if(formNotification.IsDisposed )
             {

@@ -156,6 +156,7 @@
     <Compile Include="KeCtrl.cs" />
     <Compile Include="KeEvent.cs" />
     <Compile Include="KeImage.cs" />
+    <Compile Include="KeRes.cs" />
     <Compile Include="KeVoiceCmd.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

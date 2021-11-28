@@ -312,8 +312,6 @@ namespace KeCardWin
                 case (int)PC_EVENT_TYPE.BOOT:
                     condPacket.common.cond_type = KeEvent.EVENT_TYPE.HELLO;
                     condPacket.data.hello.user_id = 0x00;
-                    condPacket.data.hello.rssi_min = -128;
-                    condPacket.data.hello.rssi_max = 127;
                     break;
                 case (int)PC_EVENT_TYPE.POWER_OFF:
                     condPacket.common.cond_type = KeEvent.EVENT_TYPE.DISCONNECT;

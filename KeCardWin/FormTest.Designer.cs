@@ -38,14 +38,15 @@ namespace KeCardWin
             this.btnCmdSlowMode = new System.Windows.Forms.Button();
             this.btnCmdFastMode = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.grpRssi = new System.Windows.Forms.GroupBox();
+            this.txtRssiMax = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.txtRssiMin = new System.Windows.Forms.TextBox();
             this.grpTimer = new System.Windows.Forms.GroupBox();
             this.txtTimerPeriod = new System.Windows.Forms.TextBox();
             this.label17 = new System.Windows.Forms.Label();
             this.grpHello = new System.Windows.Forms.GroupBox();
-            this.txtHelloRssiMax = new System.Windows.Forms.TextBox();
-            this.txtHelloRssiMin = new System.Windows.Forms.TextBox();
-            this.label13 = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
             this.txtHelloUserId = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
             this.grpDisconnect = new System.Windows.Forms.GroupBox();
@@ -91,10 +92,18 @@ namespace KeCardWin
             this.label16 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.txtRcvDateTime = new System.Windows.Forms.TextBox();
-            this.txtRcvMsg = new System.Windows.Forms.TextBox();
+            this.txtRcvData = new System.Windows.Forms.TextBox();
             this.btnReadKecMode = new System.Windows.Forms.Button();
+            this.label22 = new System.Windows.Forms.Label();
+            this.txtRcvMsg = new System.Windows.Forms.TextBox();
+            this.txtRcvRssi = new System.Windows.Forms.TextBox();
+            this.label25 = new System.Windows.Forms.Label();
+            this.btnCmdRssiOnNotify = new System.Windows.Forms.Button();
+            this.btnCmdRssiOn = new System.Windows.Forms.Button();
+            this.btnCmdRssiOff = new System.Windows.Forms.Button();
             this.grpTestCmd.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.grpRssi.SuspendLayout();
             this.grpTimer.SuspendLayout();
             this.grpHello.SuspendLayout();
             this.grpDisconnect.SuspendLayout();
@@ -146,7 +155,7 @@ namespace KeCardWin
             // 
             // btnTestTime
             // 
-            this.btnTestTime.Location = new System.Drawing.Point(27, 44);
+            this.btnTestTime.Location = new System.Drawing.Point(6, 29);
             this.btnTestTime.Name = "btnTestTime";
             this.btnTestTime.Size = new System.Drawing.Size(145, 39);
             this.btnTestTime.TabIndex = 4;
@@ -156,19 +165,22 @@ namespace KeCardWin
             // 
             // grpTestCmd
             // 
+            this.grpTestCmd.Controls.Add(this.btnCmdRssiOff);
+            this.grpTestCmd.Controls.Add(this.btnCmdRssiOn);
+            this.grpTestCmd.Controls.Add(this.btnCmdRssiOnNotify);
             this.grpTestCmd.Controls.Add(this.btnCmdSlowMode);
             this.grpTestCmd.Controls.Add(this.btnCmdFastMode);
             this.grpTestCmd.Controls.Add(this.btnTestTime);
-            this.grpTestCmd.Location = new System.Drawing.Point(12, 78);
+            this.grpTestCmd.Location = new System.Drawing.Point(12, 65);
             this.grpTestCmd.Name = "grpTestCmd";
-            this.grpTestCmd.Size = new System.Drawing.Size(540, 155);
+            this.grpTestCmd.Size = new System.Drawing.Size(540, 168);
             this.grpTestCmd.TabIndex = 5;
             this.grpTestCmd.TabStop = false;
             this.grpTestCmd.Text = "コマンド";
             // 
             // btnCmdSlowMode
             // 
-            this.btnCmdSlowMode.Location = new System.Drawing.Point(178, 89);
+            this.btnCmdSlowMode.Location = new System.Drawing.Point(157, 74);
             this.btnCmdSlowMode.Name = "btnCmdSlowMode";
             this.btnCmdSlowMode.Size = new System.Drawing.Size(145, 39);
             this.btnCmdSlowMode.TabIndex = 6;
@@ -178,7 +190,7 @@ namespace KeCardWin
             // 
             // btnCmdFastMode
             // 
-            this.btnCmdFastMode.Location = new System.Drawing.Point(178, 44);
+            this.btnCmdFastMode.Location = new System.Drawing.Point(157, 29);
             this.btnCmdFastMode.Name = "btnCmdFastMode";
             this.btnCmdFastMode.Size = new System.Drawing.Size(145, 39);
             this.btnCmdFastMode.TabIndex = 5;
@@ -188,6 +200,7 @@ namespace KeCardWin
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.grpRssi);
             this.groupBox1.Controls.Add(this.grpTimer);
             this.groupBox1.Controls.Add(this.grpHello);
             this.groupBox1.Controls.Add(this.grpDisconnect);
@@ -210,6 +223,53 @@ namespace KeCardWin
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "条件";
+            // 
+            // grpRssi
+            // 
+            this.grpRssi.Controls.Add(this.txtRssiMax);
+            this.grpRssi.Controls.Add(this.label11);
+            this.grpRssi.Controls.Add(this.label13);
+            this.grpRssi.Controls.Add(this.txtRssiMin);
+            this.grpRssi.Location = new System.Drawing.Point(791, 218);
+            this.grpRssi.Name = "grpRssi";
+            this.grpRssi.Size = new System.Drawing.Size(364, 146);
+            this.grpRssi.TabIndex = 21;
+            this.grpRssi.TabStop = false;
+            this.grpRssi.Text = "RSSI";
+            // 
+            // txtRssiMax
+            // 
+            this.txtRssiMax.Location = new System.Drawing.Point(132, 76);
+            this.txtRssiMax.Name = "txtRssiMax";
+            this.txtRssiMax.Size = new System.Drawing.Size(184, 31);
+            this.txtRssiMax.TabIndex = 20;
+            this.txtRssiMax.Text = "-20";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(6, 42);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(120, 24);
+            this.label11.TabIndex = 17;
+            this.label11.Text = "RSSI(Min)：";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(6, 79);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(125, 24);
+            this.label13.TabIndex = 18;
+            this.label13.Text = "RSSI(Max)：";
+            // 
+            // txtRssiMin
+            // 
+            this.txtRssiMin.Location = new System.Drawing.Point(132, 39);
+            this.txtRssiMin.Name = "txtRssiMin";
+            this.txtRssiMin.Size = new System.Drawing.Size(184, 31);
+            this.txtRssiMin.TabIndex = 19;
+            this.txtRssiMin.Text = "-40";
             // 
             // grpTimer
             // 
@@ -241,10 +301,6 @@ namespace KeCardWin
             // 
             // grpHello
             // 
-            this.grpHello.Controls.Add(this.txtHelloRssiMax);
-            this.grpHello.Controls.Add(this.txtHelloRssiMin);
-            this.grpHello.Controls.Add(this.label13);
-            this.grpHello.Controls.Add(this.label11);
             this.grpHello.Controls.Add(this.txtHelloUserId);
             this.grpHello.Controls.Add(this.label12);
             this.grpHello.Location = new System.Drawing.Point(28, 181);
@@ -253,38 +309,6 @@ namespace KeCardWin
             this.grpHello.TabIndex = 18;
             this.grpHello.TabStop = false;
             this.grpHello.Text = "HELLO";
-            // 
-            // txtHelloRssiMax
-            // 
-            this.txtHelloRssiMax.Location = new System.Drawing.Point(153, 113);
-            this.txtHelloRssiMax.Name = "txtHelloRssiMax";
-            this.txtHelloRssiMax.Size = new System.Drawing.Size(184, 31);
-            this.txtHelloRssiMax.TabIndex = 20;
-            // 
-            // txtHelloRssiMin
-            // 
-            this.txtHelloRssiMin.Location = new System.Drawing.Point(153, 76);
-            this.txtHelloRssiMin.Name = "txtHelloRssiMin";
-            this.txtHelloRssiMin.Size = new System.Drawing.Size(184, 31);
-            this.txtHelloRssiMin.TabIndex = 19;
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(27, 116);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(125, 24);
-            this.label13.TabIndex = 18;
-            this.label13.Text = "RSSI(Max)：";
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(25, 79);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(120, 24);
-            this.label11.TabIndex = 17;
-            this.label11.Text = "RSSI(Min)：";
             // 
             // txtHelloUserId
             // 
@@ -683,13 +707,17 @@ namespace KeCardWin
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label25);
+            this.groupBox3.Controls.Add(this.txtRcvRssi);
+            this.groupBox3.Controls.Add(this.txtRcvMsg);
+            this.groupBox3.Controls.Add(this.label22);
             this.groupBox3.Controls.Add(this.label16);
             this.groupBox3.Controls.Add(this.label15);
             this.groupBox3.Controls.Add(this.txtRcvDateTime);
-            this.groupBox3.Controls.Add(this.txtRcvMsg);
-            this.groupBox3.Location = new System.Drawing.Point(558, 90);
+            this.groupBox3.Controls.Add(this.txtRcvData);
+            this.groupBox3.Location = new System.Drawing.Point(558, 65);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(391, 128);
+            this.groupBox3.Size = new System.Drawing.Size(442, 168);
             this.groupBox3.TabIndex = 8;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Data Recieve";
@@ -708,9 +736,9 @@ namespace KeCardWin
             this.label15.AutoSize = true;
             this.label15.Location = new System.Drawing.Point(28, 44);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(62, 24);
+            this.label15.Size = new System.Drawing.Size(64, 24);
             this.label15.TabIndex = 2;
-            this.label15.Text = "Msg：";
+            this.label15.Text = "Raw：";
             // 
             // txtRcvDateTime
             // 
@@ -720,13 +748,13 @@ namespace KeCardWin
             this.txtRcvDateTime.Size = new System.Drawing.Size(258, 31);
             this.txtRcvDateTime.TabIndex = 1;
             // 
-            // txtRcvMsg
+            // txtRcvData
             // 
-            this.txtRcvMsg.Location = new System.Drawing.Point(94, 41);
-            this.txtRcvMsg.Name = "txtRcvMsg";
-            this.txtRcvMsg.ReadOnly = true;
-            this.txtRcvMsg.Size = new System.Drawing.Size(258, 31);
-            this.txtRcvMsg.TabIndex = 0;
+            this.txtRcvData.Location = new System.Drawing.Point(94, 41);
+            this.txtRcvData.Name = "txtRcvData";
+            this.txtRcvData.ReadOnly = true;
+            this.txtRcvData.Size = new System.Drawing.Size(258, 31);
+            this.txtRcvData.TabIndex = 0;
             // 
             // btnReadKecMode
             // 
@@ -737,6 +765,70 @@ namespace KeCardWin
             this.btnReadKecMode.Text = "Mode読み込み";
             this.btnReadKecMode.UseVisualStyleBackColor = true;
             this.btnReadKecMode.Click += new System.EventHandler(this.btnReadKecMode_Click);
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(20, 120);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(62, 24);
+            this.label22.TabIndex = 4;
+            this.label22.Text = "Msg：";
+            // 
+            // txtRcvMsg
+            // 
+            this.txtRcvMsg.Location = new System.Drawing.Point(94, 115);
+            this.txtRcvMsg.Name = "txtRcvMsg";
+            this.txtRcvMsg.ReadOnly = true;
+            this.txtRcvMsg.Size = new System.Drawing.Size(98, 31);
+            this.txtRcvMsg.TabIndex = 5;
+            // 
+            // txtRcvRssi
+            // 
+            this.txtRcvRssi.Location = new System.Drawing.Point(272, 115);
+            this.txtRcvRssi.Name = "txtRcvRssi";
+            this.txtRcvRssi.ReadOnly = true;
+            this.txtRcvRssi.Size = new System.Drawing.Size(98, 31);
+            this.txtRcvRssi.TabIndex = 6;
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(198, 118);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(71, 24);
+            this.label25.TabIndex = 7;
+            this.label25.Text = "RSSI：";
+            // 
+            // btnCmdRssiOnNotify
+            // 
+            this.btnCmdRssiOnNotify.Location = new System.Drawing.Point(309, 29);
+            this.btnCmdRssiOnNotify.Name = "btnCmdRssiOnNotify";
+            this.btnCmdRssiOnNotify.Size = new System.Drawing.Size(212, 39);
+            this.btnCmdRssiOnNotify.TabIndex = 7;
+            this.btnCmdRssiOnNotify.Text = "RSSI ON (Notify)";
+            this.btnCmdRssiOnNotify.UseVisualStyleBackColor = true;
+            this.btnCmdRssiOnNotify.Click += new System.EventHandler(this.btnCmdRssiOnNotify_Click);
+            // 
+            // btnCmdRssiOn
+            // 
+            this.btnCmdRssiOn.Location = new System.Drawing.Point(309, 74);
+            this.btnCmdRssiOn.Name = "btnCmdRssiOn";
+            this.btnCmdRssiOn.Size = new System.Drawing.Size(212, 39);
+            this.btnCmdRssiOn.TabIndex = 8;
+            this.btnCmdRssiOn.Text = "RSSI ON";
+            this.btnCmdRssiOn.UseVisualStyleBackColor = true;
+            this.btnCmdRssiOn.Click += new System.EventHandler(this.btnCmdRssiOn_Click);
+            // 
+            // btnCmdRssiOff
+            // 
+            this.btnCmdRssiOff.Location = new System.Drawing.Point(309, 119);
+            this.btnCmdRssiOff.Name = "btnCmdRssiOff";
+            this.btnCmdRssiOff.Size = new System.Drawing.Size(212, 39);
+            this.btnCmdRssiOff.TabIndex = 9;
+            this.btnCmdRssiOff.Text = "RSSI OFF";
+            this.btnCmdRssiOff.UseVisualStyleBackColor = true;
+            this.btnCmdRssiOff.Click += new System.EventHandler(this.btnCmdRssiOff_Click);
             // 
             // FormTest
             // 
@@ -758,6 +850,8 @@ namespace KeCardWin
             this.grpTestCmd.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.grpRssi.ResumeLayout(false);
+            this.grpRssi.PerformLayout();
             this.grpTimer.ResumeLayout(false);
             this.grpTimer.PerformLayout();
             this.grpHello.ResumeLayout(false);
@@ -812,8 +906,8 @@ namespace KeCardWin
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.ComboBox cmbDisconConnectType;
         private System.Windows.Forms.GroupBox grpHello;
-        private System.Windows.Forms.TextBox txtHelloRssiMax;
-        private System.Windows.Forms.TextBox txtHelloRssiMin;
+        private System.Windows.Forms.TextBox txtRssiMax;
+        private System.Windows.Forms.TextBox txtRssiMin;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.TextBox txtHelloUserId;
@@ -843,7 +937,15 @@ namespace KeCardWin
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.TextBox txtRcvDateTime;
-        private System.Windows.Forms.TextBox txtRcvMsg;
+        private System.Windows.Forms.TextBox txtRcvData;
         private System.Windows.Forms.Button btnReadKecMode;
+        private System.Windows.Forms.GroupBox grpRssi;
+        private System.Windows.Forms.Label label25;
+        private System.Windows.Forms.TextBox txtRcvRssi;
+        private System.Windows.Forms.TextBox txtRcvMsg;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.Button btnCmdRssiOff;
+        private System.Windows.Forms.Button btnCmdRssiOn;
+        private System.Windows.Forms.Button btnCmdRssiOnNotify;
     }
 }

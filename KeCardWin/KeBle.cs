@@ -48,11 +48,15 @@ namespace KeCardWin
         public const int KE_CMD_TIME = 0xFE;
         public const int KE_CMD_COND = 0xFD;
         public const int KE_CMD_ACT = 0xFC;
+        public const int KE_CMD_HELLO = 0xFB;
+        public const int KE_CMD_RSSI = 0xFA;
 
         public const int KE_CMD_2BYTE_LEN = 2;
         public const int KE_CMD_TIME_LEN = 6;
         public const int KE_CMD_COND_LEN = 2 + 4 + 8;
         public const int KE_CMD_ACT_LEN = 2 + 4 + 8;
+        public const int KE_CMD_HELLO_LEN = 2 + 2;
+        public const int KE_CMD_RSSI_LEN = 2 + 2;
 
         // Status
         public const int KE_STATUS_FLASH_ERASE_SUCCESS = 0x11;
@@ -439,6 +443,20 @@ namespace KeCardWin
             byte[] packet = cmd_id.Concat(data).ToArray();
 
             return packet;
+        }
+
+
+        // Rssiコマンドパケット取得
+        public static byte[] GetRssiCmdPacket( bool sw , bool notify )
+        {
+            byte[] cmd = new byte[KeBle.KE_CMD_RSSI_LEN];
+
+            cmd[0] = KeBle.KE_CMD_RSSI;
+            cmd[1] = KeBle.KE_CMD_2BYTE;
+            cmd[2] = (byte)( sw ? 0x01 : 0x00 );
+            cmd[3] = (byte)(notify ? 0x01 : 0x00);
+
+            return cmd;
         }
 
 

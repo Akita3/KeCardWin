@@ -72,8 +72,6 @@ namespace KeCardWin
         public struct CondHello
         {
             public ushort user_id;                // User Id
-            public sbyte rssi_min;               // Min
-            public sbyte rssi_max;               // Max
         };
 
 
@@ -88,6 +86,14 @@ namespace KeCardWin
         public struct CondButton{
             public byte btn_type;                // 押され方
         };
+
+        // 条件 RSSI
+        public struct CondRssi
+        {
+            public sbyte rssi_min;               // Min
+            public sbyte rssi_max;               // Max
+        };
+
 
 
         // 条件 データ
@@ -104,6 +110,8 @@ namespace KeCardWin
             public CondTimer timer;
             [FieldOffset(0)]
             public CondButton button;
+            [FieldOffset(0)]
+            public CondRssi rssi;
         };
 
 

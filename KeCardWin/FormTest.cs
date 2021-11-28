@@ -78,6 +78,7 @@ namespace KeCardWin
                 grpHello,       // Helloコマンド
                 grpTimer,       // タイマー
                 null,           // ボタン押下
+                grpRssi,        // RSSI
             };
 
             for( int i = 0; i < (int)KeEvent.EVENT_TYPE.MAX; i ++ )
@@ -161,13 +162,15 @@ namespace KeCardWin
                     break;
                 case KeEvent.EVENT_TYPE.HELLO:
                     ushort.TryParse(txtHelloUserId.Text, System.Globalization.NumberStyles.HexNumber, null, out cond.data.hello.user_id);
-                    sbyte.TryParse(txtHelloRssiMin.Text, System.Globalization.NumberStyles.HexNumber, null, out cond.data.hello.rssi_min);
-                    sbyte.TryParse(txtHelloRssiMax.Text, System.Globalization.NumberStyles.HexNumber, null, out cond.data.hello.rssi_max);
                     break;
                 case KeEvent.EVENT_TYPE.TIMER:
                     int.TryParse(txtTimerPeriod.Text, out cond.data.timer.period);
                     break;
                 case KeEvent.EVENT_TYPE.BUTTON:
+                    break;
+                case KeEvent.EVENT_TYPE.RSSI:
+                    sbyte.TryParse(txtRssiMin.Text, System.Globalization.NumberStyles.Integer, null, out cond.data.rssi.rssi_min);
+                    sbyte.TryParse(txtRssiMax.Text, System.Globalization.NumberStyles.Integer, null, out cond.data.rssi.rssi_max);
                     break;
             }
 
@@ -247,8 +250,25 @@ namespace KeCardWin
 
         public void BleRecieveMsgSafe(byte[] data)
         {
-            txtRcvMsg.Text = data[0].ToString("X02");
+            // 生データ
+            string txt = "";
+            foreach( byte v in data )
+            {
+                txt += v.ToString("X02") + " ";
+            }
+            txtRcvData.Text = txt;
             txtRcvDateTime.Text = DateTime.Now.ToString();
+
+            // タイプ別
+            if( (data.Length == KeRes.RES_NOTIFY_LEN) && (data[KeRes.RES_TYPE_POS] == KeRes.RES_NOTIFY) )
+            {
+                txtRcvMsg.Text = data[KeRes.RES_DATA_POS].ToString("X02");
+            } else if ((data.Length == KeRes.RES_RSSI_LEN) && (data[KeRes.RES_TYPE_POS] == KeRes.RES_RSSI))
+            {
+                sbyte val = (sbyte)data[KeRes.RES_DATA_POS];
+                txtRcvRssi.Text = val.ToString();
+            }
+
         }
 
         private async void btnReadKecMode_Click(object sender, EventArgs e)
@@ -257,6 +277,24 @@ namespace KeCardWin
 
             txtTestLog.AppendText("KecMode : " + (fastMode ? "FastMode(1)" : "SlowMode(0)") + "\r\n" );
 
+        }
+
+        private void btnCmdRssiOnNotify_Click(object sender, EventArgs e)
+        {
+            byte[] cmd = KeBle.GetRssiCmdPacket( true , true );
+            TestBleSendCmd(cmd);
+        }
+
+        private void btnCmdRssiOn_Click(object sender, EventArgs e)
+        {
+            byte[] cmd = KeBle.GetRssiCmdPacket(true, false);
+            TestBleSendCmd(cmd);
+        }
+
+        private void btnCmdRssiOff_Click(object sender, EventArgs e)
+        {
+            byte[] cmd = KeBle.GetRssiCmdPacket(false, false);
+            TestBleSendCmd(cmd);
         }
     }
 }
