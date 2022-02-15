@@ -38,6 +38,36 @@ namespace KeCardWin
         Guid KE_UUID_MODE = new Guid(KE_UUID_MODE_STR);
 
 
+        // Command
+        public const int KE_CMD_ERASE_FLASH = 0x01;
+        public const int KE_CMD_DISPLAY = 0x03;
+
+        public const int KE_CMD_2BYTE = 0xFF;
+        public const int KE_CMD_TIME = 0xFE;
+        public const int KE_CMD_COND = 0xFD;
+        public const int KE_CMD_ACT = 0xFC;
+        public const int KE_CMD_HELLO = 0xFB;
+        public const int KE_CMD_SYS_SET = 0xFA;
+        public const int KE_CMD_ERASE_DATA = 0xF9;
+        public const int KE_CMD_WRITE_DATA = 0xF8;
+        public const int KE_CMD_READ_DATA = 0xF7;
+        public const int KE_CMD_INFO = 0xF5;
+        public const int KE_CMD_CLEAR = 0xF4;
+
+        public const int KE_CMD_2BYTE_LEN = 2;
+        public const int KE_CMD_TIME_LEN = 6;
+        public const int KE_CMD_COND_LEN = 2 + 4 + 8;
+        public const int KE_CMD_ACT_LEN = 2 + 4 + 8;
+        public const int KE_CMD_HELLO_LEN = 2 + 2;
+        public const int KE_CMD_SYS_SET_LEN = 2 + 4;
+        public const int KE_CMD_ERASE_DATA_LEN = 2 + 4 + 2;
+        public const int KE_CMD_WRITE_DATA_HEADER_LEN = 2 + 4;
+        public const int KE_CMD_WRITE_DATA_RAW_SIZE_MAX = 224;
+        public const int KE_CMD_WRITE_DATA_LEN_MIN = KE_CMD_WRITE_DATA_HEADER_LEN + 1;
+        public const int KE_CMD_WRITE_DATA_LEN_MAX = KE_CMD_WRITE_DATA_HEADER_LEN + KE_CMD_WRITE_DATA_RAW_SIZE_MAX;
+        public const int KE_CMD_READ_DATA_LEN = 2 + 4 + 2;
+        public const int KE_CMD_INFO_LEN = 2 + 1;
+        public const int KE_CMD_CLEAR_LEN = 2 + 1;
 
         // Status
         public const int KE_STATUS_FLASH_ERASE_SUCCESS = 0x11;
@@ -148,7 +178,6 @@ namespace KeCardWin
             keCharCommand = null;
             keCharMsg = null;
             keCharMode = null;
-            ver2Flag = false;
 
             GattCharacteristicsResult charsResult = await keService.GetCharacteristicsAsync(BluetoothCacheMode.Uncached);
             if (charsResult.Status != GattCommunicationStatus.Success) return false;
@@ -441,18 +470,6 @@ namespace KeCardWin
         }
 
 
-        // ClearInfoコマンド送信
-        public async Task<bool> SendClearCmd(byte type)
-        {
-            if (hasConnected == false) return false;
-
-            byte[] cmd = GetClearCmdPacket(type);
-
-            bool r = await SendCommand(cmd);
-            return r;
-        }
-
-
 
         // ステータス読み込み
         public async Task<byte> ReadStatus()
@@ -538,10 +555,10 @@ namespace KeCardWin
         {
             int unixTime = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 
-            byte[] cmd = new byte[Cmd.CMD_TIME_LEN];
+            byte[] cmd = new byte[KeBle.KE_CMD_TIME_LEN];
 
-            cmd[0] = Cmd.CMD_TIME;
-            cmd[1] = Cmd.CMD_2BYTE;
+            cmd[0] = KeBle.KE_CMD_TIME;
+            cmd[1] = KeBle.KE_CMD_2BYTE;
             cmd[2] = (byte)(unixTime & 0xFF);
             cmd[3] = (byte)((unixTime >> 8) & 0xFF);
             cmd[4] = (byte)((unixTime >> 16) & 0xFF);
@@ -553,7 +570,7 @@ namespace KeCardWin
         // Runbook手順パケット取得
         public static byte[] getProcedurePacket(RunbookProcedure proc)
         {
-            byte[] cmd_id = { Cmd.CMD_PROC, Cmd.CMD_2BYTE };
+            byte[] cmd_id = { Cmd.CMD_COND, Cmd.CMD_2BYTE };
             byte[] data = proc.getPacket();
             byte[] packet = cmd_id.Concat(data).ToArray();
 
@@ -564,10 +581,10 @@ namespace KeCardWin
         // Helloコマンドパケット取得
         public static byte[] GetHelloCmdPacket(ushort userId)
         {
-            byte[] cmd = new byte[Cmd.CMD_HELLO_LEN];
+            byte[] cmd = new byte[KeBle.KE_CMD_HELLO_LEN];
 
-            cmd[0] = Cmd.CMD_HELLO;
-            cmd[1] = Cmd.CMD_2BYTE;
+            cmd[0] = KeBle.KE_CMD_HELLO;
+            cmd[1] = KeBle.KE_CMD_2BYTE;
             cmd[2] = (byte)((userId >> 0) & 0xFF);
             cmd[3] = (byte)((userId >> 8) & 0xFF);
             return cmd;
@@ -577,10 +594,10 @@ namespace KeCardWin
         // Rssiコマンドパケット取得
         public static byte[] GetRssiCmdPacket( bool sw , bool notify )
         {
-            byte[] cmd = new byte[Cmd.CMD_SYS_SET_LEN];
+            byte[] cmd = new byte[KeBle.KE_CMD_SYS_SET_LEN];
 
-            cmd[0] = Cmd.CMD_SYS_SET;
-            cmd[1] = Cmd.CMD_2BYTE;
+            cmd[0] = KeBle.KE_CMD_SYS_SET;
+            cmd[1] = KeBle.KE_CMD_2BYTE;
             cmd[2] = (byte)0xFF;                    // Mode (Fast or Slow)
             cmd[3] = (byte)0xFF;                    // Runbook ON/OFF
             cmd[4] = (byte)( sw ? 0x01 : 0x00 );    // RSSI ON/OFF
@@ -592,10 +609,10 @@ namespace KeCardWin
         // EraseDataコマンドパケット取得
         public static byte[] GetEraseDataCmdPacket(UInt32 addr, UInt16 length)
         {
-            byte[] cmd = new byte[Cmd.CMD_ERASE_DATA_LEN];
+            byte[] cmd = new byte[KeBle.KE_CMD_ERASE_DATA_LEN];
 
-            cmd[0] = Cmd.CMD_ERASE_DATA;
-            cmd[1] = Cmd.CMD_2BYTE;
+            cmd[0] = KeBle.KE_CMD_ERASE_DATA;
+            cmd[1] = KeBle.KE_CMD_2BYTE;
             cmd[2] = (byte)((addr >> 0) & 0xFF);
             cmd[3] = (byte)((addr >> 8) & 0xFF);
             cmd[4] = (byte)((addr >> 16) & 0xFF);
@@ -610,19 +627,19 @@ namespace KeCardWin
         // WriteDataコマンドパケット取得
         public static byte[] GetWriteDataCmdPacket(UInt32 addr, byte[] data)
         {
-            byte[] header = new byte[Cmd.CMD_WRITE_DATA_HEADER_LEN];
+            byte[] header = new byte[KE_CMD_WRITE_DATA_HEADER_LEN];
 
-            header[0] = Cmd.CMD_WRITE_DATA;
-            header[1] = Cmd.CMD_2BYTE;
+            header[0] = KeBle.KE_CMD_WRITE_DATA;
+            header[1] = KeBle.KE_CMD_2BYTE;
             header[2] = (byte)((addr >> 0) & 0xFF);
             header[3] = (byte)((addr >> 8) & 0xFF);
             header[4] = (byte)((addr >> 16) & 0xFF);
             header[5] = (byte)((addr >> 24) & 0xFF);
 
-            byte[] cmd = new byte[Cmd.CMD_WRITE_DATA_HEADER_LEN + data.Length];
+            byte[] cmd = new byte[KE_CMD_WRITE_DATA_HEADER_LEN + data.Length];
 
-            Array.Copy(header, cmd, Cmd.CMD_WRITE_DATA_HEADER_LEN);
-            Array.Copy(data, 0, cmd, Cmd.CMD_WRITE_DATA_HEADER_LEN, data.Length);
+            Array.Copy(header, cmd, KE_CMD_WRITE_DATA_HEADER_LEN);
+            Array.Copy(data, 0, cmd, KE_CMD_WRITE_DATA_HEADER_LEN, data.Length);
 
             return cmd;
         }
@@ -631,10 +648,10 @@ namespace KeCardWin
         // ReadDataコマンドパケット取得
         public static byte[] GetReadDataCmdPacket(UInt32 addr , UInt16 length)
         {
-            byte[] cmd = new byte[Cmd.CMD_READ_DATA_LEN];
+            byte[] cmd = new byte[KeBle.KE_CMD_READ_DATA_LEN];
 
-            cmd[0] = Cmd.CMD_READ_DATA;
-            cmd[1] = Cmd.CMD_2BYTE;
+            cmd[0] = KeBle.KE_CMD_READ_DATA;
+            cmd[1] = KeBle.KE_CMD_2BYTE;
             cmd[2] = (byte)((addr >> 0) & 0xFF);
             cmd[3] = (byte)((addr >> 8) & 0xFF);
             cmd[4] = (byte)((addr >> 16) & 0xFF);
@@ -649,10 +666,10 @@ namespace KeCardWin
         // Mode changeコマンドパケット取得
         public static byte[] GetModeChangeCmdPacket(bool fastMode)
         {
-            byte[] cmd = new byte[Cmd.CMD_SYS_SET_LEN];
+            byte[] cmd = new byte[KeBle.KE_CMD_SYS_SET_LEN];
 
-            cmd[0] = Cmd.CMD_SYS_SET;
-            cmd[1] = Cmd.CMD_2BYTE;
+            cmd[0] = KeBle.KE_CMD_SYS_SET;
+            cmd[1] = KeBle.KE_CMD_2BYTE;
             cmd[2] = (byte)(fastMode ? 0x01 : 0x00);    // Mode (Fast or Slow)
             cmd[3] = (byte)0xFF;                        // Runbook ON/OFF
             cmd[4] = (byte)0xFF;                        // RSSI ON/OFF
@@ -665,10 +682,10 @@ namespace KeCardWin
         // Runbookコマンドパケット取得
         public static byte[] GetRunbookCmdPacket(bool sw)
         {
-            byte[] cmd = new byte[Cmd.CMD_SYS_SET_LEN];
+            byte[] cmd = new byte[KeBle.KE_CMD_SYS_SET_LEN];
 
-            cmd[0] = Cmd.CMD_SYS_SET;
-            cmd[1] = Cmd.CMD_2BYTE;
+            cmd[0] = KeBle.KE_CMD_SYS_SET;
+            cmd[1] = KeBle.KE_CMD_2BYTE;
             cmd[2] = (byte)0xFF;                        // Mode (Fast or Slow)
             cmd[3] = (byte)(sw ? 0x01 : 0x00);          // Runbook ON/OFF
             cmd[4] = (byte)0xFF;                        // RSSI ON/OFF
@@ -681,10 +698,10 @@ namespace KeCardWin
         // Infoコマンドパケット取得
         public static byte[] GetInfoCmdPacket(byte type)
         {
-            byte[] cmd = new byte[Cmd.CMD_INFO_LEN];
+            byte[] cmd = new byte[KeBle.KE_CMD_INFO_LEN];
 
-            cmd[0] = Cmd.CMD_INFO;
-            cmd[1] = Cmd.CMD_2BYTE;
+            cmd[0] = KeBle.KE_CMD_INFO;
+            cmd[1] = KeBle.KE_CMD_2BYTE;
             cmd[2] = type;
 
             return cmd;
@@ -693,10 +710,10 @@ namespace KeCardWin
         // Clearコマンドパケット取得
         public static byte[] GetClearCmdPacket(byte type)
         {
-            byte[] cmd = new byte[Cmd.CMD_CLEAR_LEN];
+            byte[] cmd = new byte[KeBle.KE_CMD_CLEAR_LEN];
 
-            cmd[0] = Cmd.CMD_CLEAR;
-            cmd[1] = Cmd.CMD_2BYTE;
+            cmd[0] = KeBle.KE_CMD_CLEAR;
+            cmd[1] = KeBle.KE_CMD_2BYTE;
             cmd[2] = type;
 
             return cmd;

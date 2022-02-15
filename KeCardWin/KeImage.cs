@@ -32,7 +32,7 @@ namespace KeCardWin
         public const int IMG_BYTE_N = IMG_WIDTH * IMG_HEIGHT * IMG_BIT_N / 8;
 
         // 1パケットのデータ量
-        public const int DATA_SIZE_HIGH_SPEED = 128;
+        public const int DATA_SIZE_HIGH_SPEED = 240;
 
         // 送信データサイズ
         public static int sendDataSize = DATA_SIZE_HIGH_SPEED;
@@ -379,13 +379,13 @@ namespace KeCardWin
             var size = IMG_BYTE_N - pos;
             if (size > sendDataSize) size = sendDataSize;
 
-            byte[] data = new byte[size];
+            byte[] data = new byte[sendDataSize];
             Array.Copy(sendingImage, pos, data, 0, size);
 
-            byte[] pkt = new byte[HEADER_SIZE + size];
+            byte[] pkt = new byte[HEADER_SIZE + sendDataSize];
 
             Array.Copy(header, pkt, HEADER_SIZE);
-            Array.Copy(data, 0, pkt, HEADER_SIZE, size);
+            Array.Copy(data, 0, pkt, HEADER_SIZE, sendDataSize);
 
             sendingNo++;
 

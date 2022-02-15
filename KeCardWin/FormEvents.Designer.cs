@@ -29,21 +29,21 @@ namespace KeCardWin
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEvents));
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.barTransfer = new System.Windows.Forms.ProgressBar();
             this.txtBleAddr = new System.Windows.Forms.TextBox();
-            this.btnAdd = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.txtMsg = new System.Windows.Forms.TextBox();
+            this.btnAdd = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnOk
             // 
-            this.btnOk.Location = new System.Drawing.Point(473, 12);
+            this.btnOk.Location = new System.Drawing.Point(218, 6);
+            this.btnOk.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(405, 60);
+            this.btnOk.Size = new System.Drawing.Size(187, 30);
             this.btnOk.TabIndex = 5;
             this.btnOk.Text = "設定有効化(データ転送)";
             this.btnOk.UseVisualStyleBackColor = true;
@@ -51,9 +51,10 @@ namespace KeCardWin
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(151, 12);
+            this.btnCancel.Location = new System.Drawing.Point(70, 6);
+            this.btnCancel.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(161, 60);
+            this.btnCancel.Size = new System.Drawing.Size(74, 30);
             this.btnCancel.TabIndex = 7;
             this.btnCancel.Text = "キャンセル";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -61,35 +62,27 @@ namespace KeCardWin
             // 
             // barTransfer
             // 
-            this.barTransfer.Location = new System.Drawing.Point(219, 94);
+            this.barTransfer.Location = new System.Drawing.Point(103, 47);
+            this.barTransfer.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.barTransfer.Name = "barTransfer";
-            this.barTransfer.Size = new System.Drawing.Size(298, 32);
+            this.barTransfer.Size = new System.Drawing.Size(136, 16);
             this.barTransfer.TabIndex = 9;
             // 
             // txtBleAddr
             // 
-            this.txtBleAddr.Location = new System.Drawing.Point(12, 94);
+            this.txtBleAddr.Location = new System.Drawing.Point(6, 47);
+            this.txtBleAddr.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txtBleAddr.Name = "txtBleAddr";
             this.txtBleAddr.ReadOnly = true;
-            this.txtBleAddr.Size = new System.Drawing.Size(201, 31);
+            this.txtBleAddr.Size = new System.Drawing.Size(95, 19);
             this.txtBleAddr.TabIndex = 11;
-            // 
-            // btnAdd
-            // 
-            this.btnAdd.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnAdd.BackgroundImage")));
-            this.btnAdd.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.btnAdd.Location = new System.Drawing.Point(12, 12);
-            this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(60, 60);
-            this.btnAdd.TabIndex = 0;
-            this.btnAdd.UseVisualStyleBackColor = true;
-            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(318, 12);
+            this.btnSave.Location = new System.Drawing.Point(147, 6);
+            this.btnSave.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(149, 60);
+            this.btnSave.Size = new System.Drawing.Size(69, 30);
             this.btnSave.TabIndex = 12;
             this.btnSave.Text = "設定保存";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -97,18 +90,31 @@ namespace KeCardWin
             // 
             // txtMsg
             // 
-            this.txtMsg.Location = new System.Drawing.Point(523, 94);
+            this.txtMsg.Location = new System.Drawing.Point(241, 47);
+            this.txtMsg.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txtMsg.Name = "txtMsg";
             this.txtMsg.ReadOnly = true;
-            this.txtMsg.Size = new System.Drawing.Size(355, 31);
+            this.txtMsg.Size = new System.Drawing.Size(166, 19);
             this.txtMsg.TabIndex = 13;
+            // 
+            // btnAdd
+            // 
+            this.btnAdd.BackgroundImage = global::KeCardWin.Properties.Resources.baseline_add_black_24dp1;
+            this.btnAdd.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnAdd.Location = new System.Drawing.Point(6, 6);
+            this.btnAdd.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
+            this.btnAdd.Name = "btnAdd";
+            this.btnAdd.Size = new System.Drawing.Size(28, 30);
+            this.btnAdd.TabIndex = 0;
+            this.btnAdd.UseVisualStyleBackColor = true;
+            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
             // FormEvents
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 24F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(900, 894);
+            this.ClientSize = new System.Drawing.Size(415, 447);
             this.Controls.Add(this.txtMsg);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.txtBleAddr);
@@ -116,6 +122,7 @@ namespace KeCardWin
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.btnAdd);
+            this.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.Name = "FormEvents";
             this.Text = "イベント編集";
             this.Load += new System.EventHandler(this.FormEvents_Load);

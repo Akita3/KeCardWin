@@ -40,9 +40,10 @@ namespace KeCardWin
             // btnOK
             // 
             this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOK.Location = new System.Drawing.Point(441, 292);
+            this.btnOK.Location = new System.Drawing.Point(199, 157);
+            this.btnOK.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(166, 60);
+            this.btnOK.Size = new System.Drawing.Size(77, 30);
             this.btnOK.TabIndex = 0;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
@@ -51,9 +52,10 @@ namespace KeCardWin
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
+            this.label1.Location = new System.Drawing.Point(10, 9);
+            this.label1.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(335, 24);
+            this.label1.Size = new System.Drawing.Size(169, 12);
             this.label1.TabIndex = 1;
             this.label1.Text = "(E)CARDのボタンが押されました！";
             // 
@@ -61,9 +63,10 @@ namespace KeCardWin
             // 
             this.picImage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.picImage.Image = global::KeCardWin.Properties.Resources.SAMPLE_IMAGE;
-            this.picImage.Location = new System.Drawing.Point(12, 61);
+            this.picImage.Location = new System.Drawing.Point(8, 30);
+            this.picImage.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.picImage.Name = "picImage";
-            this.picImage.Size = new System.Drawing.Size(264, 176);
+            this.picImage.Size = new System.Drawing.Size(122, 88);
             this.picImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picImage.TabIndex = 21;
             this.picImage.TabStop = false;
@@ -71,9 +74,10 @@ namespace KeCardWin
             // btnSwitchImage
             // 
             this.btnSwitchImage.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnSwitchImage.Location = new System.Drawing.Point(282, 80);
+            this.btnSwitchImage.Location = new System.Drawing.Point(151, 52);
+            this.btnSwitchImage.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.btnSwitchImage.Name = "btnSwitchImage";
-            this.btnSwitchImage.Size = new System.Drawing.Size(229, 60);
+            this.btnSwitchImage.Size = new System.Drawing.Size(106, 30);
             this.btnSwitchImage.TabIndex = 22;
             this.btnSwitchImage.Text = "表示を切り替える";
             this.btnSwitchImage.UseVisualStyleBackColor = true;
@@ -82,23 +86,25 @@ namespace KeCardWin
             // lblMsg
             // 
             this.lblMsg.AutoSize = true;
-            this.lblMsg.Location = new System.Drawing.Point(12, 240);
+            this.lblMsg.Location = new System.Drawing.Point(6, 120);
+            this.lblMsg.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.lblMsg.Name = "lblMsg";
-            this.lblMsg.Size = new System.Drawing.Size(540, 24);
+            this.lblMsg.Size = new System.Drawing.Size(272, 12);
             this.lblMsg.TabIndex = 23;
             this.lblMsg.Text = "(E)CARDのイメージが切り替わるまで少しお待ちください。";
             this.lblMsg.Visible = false;
             // 
             // FormNotification
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 24F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(619, 364);
+            this.ClientSize = new System.Drawing.Size(286, 198);
             this.Controls.Add(this.lblMsg);
             this.Controls.Add(this.btnSwitchImage);
             this.Controls.Add(this.picImage);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnOK);
+            this.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.Name = "FormNotification";
             this.Text = "通知";
             this.Load += new System.EventHandler(this.FormNotification_Load);

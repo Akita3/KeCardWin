@@ -63,6 +63,26 @@ namespace KeCardWin.Properties {
         /// <summary>
         ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
         /// </summary>
+        internal static System.Drawing.Bitmap baseline_add_black_24dp {
+            get {
+                object obj = ResourceManager.GetObject("baseline_add_black_24dp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap baseline_add_black_24dp1 {
+            get {
+                object obj = ResourceManager.GetObject("baseline_add_black_24dp1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
         internal static System.Drawing.Bitmap baseline_radio_button_unchecked_black_24dp {
             get {
                 object obj = ResourceManager.GetObject("baseline_radio_button_unchecked_black_24dp", resourceCulture);
@@ -76,6 +96,66 @@ namespace KeCardWin.Properties {
         internal static System.Drawing.Bitmap baseline_subdirectory_arrow_right_black_24dp {
             get {
                 object obj = ResourceManager.GetObject("baseline_subdirectory_arrow_right_black_24dp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap outline_computer_black_24dp {
+            get {
+                object obj = ResourceManager.GetObject("outline_computer_black_24dp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap outline_mic_black_24dp {
+            get {
+                object obj = ResourceManager.GetObject("outline_mic_black_24dp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap outline_photo_size_select_actual_black_24dp {
+            get {
+                object obj = ResourceManager.GetObject("outline_photo_size_select_actual_black_24dp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap outline_radio_button_checked_black_24dp {
+            get {
+                object obj = ResourceManager.GetObject("outline_radio_button_checked_black_24dp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap outline_timer_black_24dp {
+            get {
+                object obj = ResourceManager.GetObject("outline_timer_black_24dp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap outline_today_black_24dp {
+            get {
+                object obj = ResourceManager.GetObject("outline_today_black_24dp", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

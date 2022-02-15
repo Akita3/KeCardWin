@@ -29,16 +29,24 @@ namespace KeCardWin
         // ボタン押し通知用フォーム
         FormNotification formNotification;
 
+        // 本体設定用フォーム
+        FormKeconfig formKeconfig;
+
+        // テスト用フォーム
+        FormTest formTest;
+
+        // デバッグ用フォーム
+        FormTerminal formTerminal;
 
         // イメージ
         Bitmap baseImage;   // フィルター前のイメージ
         Bitmap keImage;     // フィルター後のイメージ
 
         // BLEアドレス
-        public ulong bleAddr;
+        public ulong bleAddr = 0;
 
         // スキャン結果のBLEアドレスリスト
-        public List<ulong> scanBleAddrs;
+        public Dictionary<ulong, string> scanBleAddrs = new Dictionary<ulong, string>();
 
         // Tab Index 
         private const int TAB_IDX_MEMO = 0;
@@ -79,26 +87,20 @@ namespace KeCardWin
         }
 
         // コンボボックスのBLEアドレス更新
-        private void UpdateCmbBleAddr()
+        private void UpdateCmbBleAddr(List<ulong> addrs )
         {
-            foreach( ulong addr in scanBleAddrs )
-            {
-                string text = KeBle.BleAddrToString(addr);
 
-                int index = cmbBleAddr.Items.IndexOf(text);
-                if (index < 0)
+            foreach (var addr in addrs)
+            {
+                if (scanBleAddrs.ContainsKey(addr) == false)
                 {
+                    string text = KeBle.BleAddrToString(addr);
+                    scanBleAddrs.Add(addr, text);
                     cmbBleAddr.Items.Add(text);
 
                     if (cmbBleAddr.SelectedIndex < 0)
                     {
                         cmbBleAddr.SelectedIndex = 0;
-                        bleAddr = addr;
-
-                        if(delegateFormEventsUpdateBle != null )
-                        {
-                            delegateFormEventsUpdateBle(bleAddr);
-                        }
                     }
                 }
             }
@@ -109,7 +111,7 @@ namespace KeCardWin
         {
             for( int i = 0;i <= KeBle.KE_IMAGE_NO_MAX; i ++ )
             {
-                cmbImageNo.Items.Add( "Slot " + (i + 1).ToString());
+                cmbImageNo.Items.Add( (i + 1).ToString());
             }
             cmbImageNo.SelectedIndex = appSetting.imageNo;
         }
@@ -179,6 +181,8 @@ namespace KeCardWin
 
             // メニューを設定
             CheckMenuFilter(appSetting.imgFilter);
+            menuTest.Visible = appSetting.testMode;
+            menuDebug.Visible = appSetting.debugMode;
 
             // ダークモード設定
             menuDark.Checked = appSetting.darkMode;
@@ -202,6 +206,9 @@ namespace KeCardWin
             // 動作モード
             txtWorkMode.Text = KeCtrl.WORK_MODE_STR[(int)KeCtrl.workMode];
 
+            // デバッグ情報読み込み
+            Common.ramAll.Load(appSetting.debugRamDir , appSetting.debugRamList.Split(','));
+
         }
 
         // キャプチャボタンクリック
@@ -212,10 +219,11 @@ namespace KeCardWin
                 btnCapture.Text = "キャンセル";
 
                 Bitmap bitmap = ScCap.Capture(this);
-                this.TopMost = true;
-                this.TopMost = false;
                 formScreen.SetScreenImage(bitmap);
                 formScreen.Show();
+
+                this.TopMost = true;
+                this.TopMost = false;
 
                 // AppSetting.SaveBitmap(bitmap, "Screen.bmp");
             }
@@ -352,9 +360,9 @@ namespace KeCardWin
         // スキャン用タイマー定期処理
         private async void tmrScan_Tick(object sender, EventArgs e)
         {
-            scanBleAddrs = await KeCtrl.BleScan(5);
+            var addrs = await KeCtrl.BleScan(5);
 
-            UpdateCmbBleAddr();
+            UpdateCmbBleAddr( addrs );
 
         }
 
@@ -593,30 +601,49 @@ namespace KeCardWin
 
         private async void menuTest_Click(object sender, EventArgs e)
         {
+            // 既に実行されている
+            if (formTest != null && formTest.IsDisposed == false)
+            {
+                return;
+            }
+
             // 今のモードをチェック
-            if(KeCtrl.workMode != KeCtrl.WORK_MODE.BLE_SCAN)
+            if (KeCtrl.workMode != KeCtrl.WORK_MODE.BLE_SCAN)
             {
                 MessageBox.Show("無線接続を停止してください。");
                 return;
             }
 
-            FormTest frm = new FormTest();
-            frm.testBleAddr = bleAddr;
+            formTest = new FormTest();
+            formTest.FormClosed += new FormClosedEventHandler(FormTest_FormClose);
+
+            formTest.testBleAddr = bleAddr;
+
+            // デリゲート削除
+            KeCtrl.keBle.delegateKeBleRecieveMsg -= BleRecieveMsg;
 
             // デリゲート登録
-            KeCtrl.keBle.delegateKeBleRecieveMsg = frm.BleRecieveMsg;
+            KeCtrl.keBle.delegateKeBleRecieveData += formTest.BleRecieveData;
 
             // don't scan
             await KeCtrl.SetIdleMode();
 
-            frm.ShowDialog();
+            formTest.Show();
 
+        }
+
+
+        // FormTestの閉じるイベント
+        private async void FormTest_FormClose(object sender, FormClosedEventArgs e)
+        {
             // scan モードへ
             await KeCtrl.SetScanMode();
 
-            // デリゲート再登録
-            KeCtrl.keBle.delegateKeBleRecieveMsg = BleRecieveMsg;
+            // デリゲート削除
+            KeCtrl.keBle.delegateKeBleRecieveData = null;
 
+            // デリゲート再登録
+            KeCtrl.keBle.delegateKeBleRecieveMsg += BleRecieveMsg;
         }
 
         // パソコンがレジューム復帰した
@@ -675,15 +702,15 @@ namespace KeCardWin
             // 強制OFF
             KeVoiceOnOff(false);
 
-            delegateFormEventsUpdateBle = frm.UpdateBleAddr;
-            delegateFormEventsTimerProgress = frm.TimerProgress;
+            delegateFormEventsUpdateBle += frm.UpdateBleAddr;
+            delegateFormEventsTimerProgress += frm.TimerProgress;
             frm.apEventsEdit = apEventsSetting;
             if(bleAddr != 0x00) frm.txtBleAddr.Text = KeBle.BleAddrToString(bleAddr);
 
             var dres = frm.ShowDialog();
 
-            delegateFormEventsUpdateBle = null;
-            delegateFormEventsTimerProgress = null;
+            delegateFormEventsUpdateBle -= frm.UpdateBleAddr;
+            delegateFormEventsTimerProgress -= frm.TimerProgress;
 
             // 設定を復元
             KeVoiceOnOff(voiceState);
@@ -702,7 +729,7 @@ namespace KeCardWin
 
         public void BleRecieveMsg(byte[] data)
         {
-            this.Invoke(new DelegateKeBleRecieveMsg(this.BleRecieveMsgSafe), data);
+            this.Invoke(new DelegateKeBleRecieveData(this.BleRecieveMsgSafe), data);
         }
 
         public void BleRecieveMsgSafe(byte[] data)
@@ -783,6 +810,70 @@ namespace KeCardWin
         private void btnVoice_Click(object sender, EventArgs e)
         {
             KeVoiceOnOff(keVoiceCmd == null ? true : false);
+        }
+
+        private void menuDebug_Click(object sender, EventArgs e)
+        {
+            // 既に実行されている
+            if (formTerminal != null && formTerminal.IsDisposed == false)
+            {
+                return;
+            }
+
+            formTerminal = new FormTerminal();
+
+            formTerminal.Show();
+
+        }
+
+        private void menuKeconfig_Click(object sender, EventArgs e)
+        {
+            // 既に実行されている
+            if (formKeconfig == null || formKeconfig.IsDisposed == true)
+            {
+                formKeconfig = new FormKeconfig();
+            }
+
+
+            formKeconfig.UpdateBleAddr(bleAddr);
+            delegateFormEventsUpdateBle += formKeconfig.UpdateBleAddr;
+            delegateFormEventsTimerProgress += formKeconfig.TimerProgress;
+
+            formKeconfig.ShowDialog();
+
+            delegateFormEventsUpdateBle -= formKeconfig.UpdateBleAddr;
+            delegateFormEventsTimerProgress -= formKeconfig.TimerProgress;
+
+        }
+
+        private void menuLoadImage_Click(object sender, EventArgs e)
+        {
+            // Tab切り替え
+            tabMain.SelectedIndex = TAB_IDX_IMAGE;
+
+            System.Windows.Forms.OpenFileDialog dlg = FormEvents.OpenImageFileDialog();
+
+            //ダイアログを表示する
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                Bitmap bitmap = new Bitmap(dlg.FileName);
+                if (bitmap == null) return;
+
+                SetKeImage(bitmap);
+            }
+
+        }
+
+        private void cmbBleAddr_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+            bleAddr = scanBleAddrs.FirstOrDefault(x => x.Value == cmbBleAddr.Text).Key;
+
+            if (delegateFormEventsUpdateBle != null)
+            {
+                delegateFormEventsUpdateBle(bleAddr);
+            }
+
         }
     }
 }

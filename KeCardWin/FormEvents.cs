@@ -18,8 +18,8 @@ namespace KeCardWin
 
     public partial class FormEvents : Form
     {
-        const int EVENT_CTRL_X = 12;
-        const int EVENT_CTRL_Y = 142;
+        const int EVENT_CTRL_X = 10;
+        const int EVENT_CTRL_Y = 120;
         const int EVENT_CTRL_Y_GAP = 6;
 
         public ApEvents apEventsEdit = new ApEvents();
@@ -155,7 +155,7 @@ namespace KeCardWin
 
         private async void btnOk_Click(object sender, EventArgs e)
         {
-            bool res;
+            bool res = false;
 
             // 設定保存
             btnSave_Click(null, null);
@@ -192,7 +192,7 @@ namespace KeCardWin
             await KeCtrl .SetScanMode();
 
             // 低速接続するかを聞く
-            if(bleConnectionNeeds)
+            if(res && bleConnectionNeeds)
             {
                 DialogResult dres = MessageBox.Show("機能を有効にするには無線接続が必要です。今すぐ無線接続(低速)しますか？", "無線接続の確認", MessageBoxButtons.YesNo);
 
@@ -214,7 +214,7 @@ namespace KeCardWin
 
         private void UpdateCtrlsPos()
         {
-            int y = EVENT_CTRL_Y;
+            int y = txtBleAddr.Bottom + EVENT_CTRL_Y_GAP;
 
             foreach( CtrlEvent ctrlEvent in ctrlEvents)
             {

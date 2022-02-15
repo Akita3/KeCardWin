@@ -21,12 +21,18 @@ namespace KeCardWin
         public string transferImageName = "transferImage.png";
         public bool darkMode = false;
         public ExRichTextBox.RuledLineType ruledLineType = ExRichTextBox.RuledLineType.Dash;
-        public int waitAfterTransfer = 0;
+        public int waitAfterTransfer = 90;
         public int transferPacketSize = KeImage.DATA_SIZE_HIGH_SPEED;
 
         public string keName = "かっこいいカード";
 
+        public bool testMode = false;
+        public bool debugMode = false;
+        public string debugComPort = "";
+        public bool debugComAutoConnect = true;
 
+        public string debugRamDir = @"test\ram";
+        public string debugRamList = @"kesys,keconf,kekey,keevent,procs1,procs2";
 
         // 読み込んだパラメータの値チェック
         static private void CheckValue(ref AppSetting appSetting)
@@ -101,6 +107,7 @@ namespace KeCardWin
         // ビットマップ書き込み (例外スルー)
         static public bool SaveBitmap(Bitmap bitmap , string fileName)
         {
+            if (bitmap == null) return false;
             bool res = false;
             try
             {

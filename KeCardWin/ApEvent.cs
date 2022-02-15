@@ -45,34 +45,22 @@ namespace KeCardWin
             return grayImage;
         }
 
-
         // Runbookパケット取得
-        public bool GetRunbookPackets(ref byte cno, ref byte ano, ref List<Runbook.CondPacket> condPackets, ref List<Runbook.ActionPacket> actionPackets)
+        public virtual List<RunbookProcedure> getRunbookProcedure( int _no )
         {
-            bool res = true;
+            List<RunbookProcedure> procs = new List<RunbookProcedure>();
 
-            // リスト作成
-            condPackets = new List<Runbook.CondPacket>();
-            actionPackets = new List<Runbook.ActionPacket>();
+            RunbookProcedure proc = new RunbookProcedure(_no
+                                                        , KeEvent.EVENT_TYPE.NONE
+                                                        , KeSys.KESYS_STATE_ALL
+                                                        , Runbook.ACTION_TYPE.NONE
+                                                        , false
+                                                        , false
+                                                        , false);
+            procs.Add(proc);
 
-            switch (eventType)
-            {
-                case EVENT_TYPE.TIMER:
-                    ((ApEventTimer)this).GetRunbookPackets(ref cno, ref ano, ref condPackets, ref actionPackets);
-                    break;
-                case EVENT_TYPE.BUTTON:
-                    ((ApEventButton)this).GetRunbookPackets(ref cno, ref ano, ref condPackets, ref actionPackets);
-                    break;
-                case EVENT_TYPE.PC:
-                    ((ApEventPc)this).GetRunbookPackets(ref cno, ref ano, ref condPackets, ref actionPackets);
-                    break;
-                default:
-                    break;
-            }
-
-            return res;
+            return procs;
         }
-
 
         // イベントタイプ
         public enum EVENT_TYPE : int
@@ -139,49 +127,41 @@ namespace KeCardWin
             timeout = TIMEOUT_DEFAULT;
         }
 
-
-        public bool GetRunbookPackets(ref byte cno, ref byte ano, ref List<Runbook.CondPacket> condPackets, ref List<Runbook.ActionPacket> actionPackets)
+        public int getPeriod()
         {
-            bool res = true;
-
-            // 条件作成
-            Runbook.CondPacket condPacket = new Runbook.CondPacket();
-            condPacket.common.cond_no = cno;
-            condPacket.common.cond_type = KeEvent.EVENT_TYPE.TIMER;
-            condPacket.common.action_no = ano;
-            condPacket.common.cond_info = isSubEvent ? Runbook.GetCondInfo(true, true, true) : Runbook.GetCondInfo(false, false, true);
-
+            int _period = 0;
             switch (subEventType)
             {
                 case (int)TIMER_EVENT_TYPE.DATE_TIME:
                     TimeSpan timeSpan = dateTime - DateTime.Now;
                     int tm = 0;
                     if (timeSpan.TotalSeconds > 0) tm = (int)timeSpan.TotalSeconds;
-                    condPacket.data.timer.period = tm;
+                    _period = tm;
                     break;
                 case (int)TIMER_EVENT_TYPE.TIMER:
-                    condPacket.data.timer.period = timeout;
-                    break;
-                default:
-                    res = false;
+                    _period = timeout;
                     break;
             }
+            return _period;
+        }
 
-            // アクション作成
-            Runbook.ActionPacket actionPacket = new Runbook.ActionPacket();
-            actionPacket.common.act_no = ano;
-            actionPacket.common.act_type = Runbook.ACTION_TYPE.IMAGE;
-            actionPacket.data.image.image_no = (byte)imageNo;
 
-            // リストに追加
-            condPackets.Add(condPacket);
-            actionPackets.Add(actionPacket);
+        // Runbookパケット取得
+        public override List<RunbookProcedure> getRunbookProcedure(int _no)
+        {
+            RunbookProcedure proc = new RunbookProcedure( _no
+                                                        , KeSys.KESYS_STATE_ALL
+                                                        , isSubEvent
+                                                        , false
+                                                        , isSubEvent ? false : true
+                                                        );
 
-            // cno , ano インクリメント
-            cno++;
-            ano++;
+            proc.setTimerCond( getPeriod() );
+            proc.setImageAction(imageNo);
 
-            return res;
+            List<RunbookProcedure> procs = new List<RunbookProcedure>();
+            procs.Add(proc);
+            return procs;
         }
 
     }
@@ -220,45 +200,24 @@ namespace KeCardWin
 
         }
 
-        public bool GetRunbookPackets(ref byte cno, ref byte ano, ref List<Runbook.CondPacket> condPackets, ref List<Runbook.ActionPacket> actionPackets)
+
+        // Runbookパケット取得
+        public override List<RunbookProcedure> getRunbookProcedure(int _no)
         {
-            bool res = false;
+            RunbookProcedure proc = new RunbookProcedure(_no
+                                                        , KeSys.KESYS_STATE_ALL
+                                                        , isSubEvent
+                                                        , true
+                                                        , isSubEvent ? false : true
+                                                        );
 
-            // 条件作成
-            Runbook.CondPacket condPacket = new Runbook.CondPacket();
-            condPacket.common.cond_no = cno;
-            condPacket.common.cond_type = KeEvent.EVENT_TYPE.BUTTON;
-            condPacket.common.action_no = ano;
-            condPacket.common.cond_info = (byte)( (int)Runbook.COND_INFO.ENABLE | (int)Runbook.COND_INFO.REPEAT_);
+            proc.setButtonCond(KeEvent.BUTTON_PUSHED.SHORT);
+            proc.setNotifyAction((int)'A');
 
-            switch (subEventType)
-            {
-                case (int)BUTTON_EVENT_TYPE.PUSH:
-                    condPacket.data.button.btn_type = (byte)KeEvent.BUTTON_PUSHED.SHORT;
-                    break;
-                default:
-                    res = false;
-                    break;
-            }
-
-            // アクション作成
-            Runbook.ActionPacket actionPacket = new Runbook.ActionPacket();
-            actionPacket.common.act_no = ano;
-            actionPacket.common.act_type = Runbook.ACTION_TYPE.NOTIFY;
-            actionPacket.data.notify.msg = (byte)'A';
-
-            // リストに追加
-            condPackets.Add(condPacket);
-            actionPackets.Add(actionPacket);
-
-            // cno , ano インクリメント
-            cno++;
-            ano++;
-
-            return res;
+            List<RunbookProcedure> procs = new List<RunbookProcedure>();
+            procs.Add(proc);
+            return procs;
         }
-
-
 
     }
 
@@ -297,49 +256,34 @@ namespace KeCardWin
 
         }
 
-        public bool GetRunbookPackets(ref byte cno, ref byte ano, ref List<Runbook.CondPacket> condPackets, ref List<Runbook.ActionPacket> actionPackets)
-        {
-            bool res = false;
 
-            // 条件作成
-            Runbook.CondPacket condPacket = new Runbook.CondPacket();
-            condPacket.common.cond_no = cno;
-            condPacket.common.action_no = ano;
-            condPacket.common.cond_info = (byte)((int)Runbook.COND_INFO.ENABLE | (int)Runbook.COND_INFO.REPEAT_);
+        // Runbookパケット取得
+        public override List<RunbookProcedure> getRunbookProcedure(int _no)
+        {
+            RunbookProcedure proc = new RunbookProcedure(_no
+                                                        , KeSys.KESYS_STATE_ALL
+                                                        , isSubEvent
+                                                        , true
+                                                        , isSubEvent ? false : true
+                                                        );
 
             switch (subEventType)
             {
                 case (int)PC_EVENT_TYPE.BOOT:
-                    condPacket.common.cond_type = KeEvent.EVENT_TYPE.HELLO;
-                    condPacket.data.hello.user_id = 0x00;
+                    proc.setHelloCond(0x00);
                     break;
                 case (int)PC_EVENT_TYPE.POWER_OFF:
-                    condPacket.common.cond_type = KeEvent.EVENT_TYPE.DISCONNECT;
-                    condPacket.data.disconnect.con_type = (byte)KeEvent.CONNECT_TYPE.SLOW;
-                    // condPacket.data.disconnect.discon_type = (byte)KeEvent.DISCONNECT_TYPE.TIMEOUT;
-                    condPacket.data.disconnect.discon_type = (byte)KeEvent.DISCONNECT_TYPE.ALL;
+                    proc.setDisconnectCond(KeEvent.CONNECT_TYPE.SLOW, KeEvent.DISCONNECT_TYPE.ALL);
                     break;
                 default:
-                    res = false;
                     break;
             }
 
+            proc.setImageAction(imageNo);
 
-            // アクション作成
-            Runbook.ActionPacket actionPacket = new Runbook.ActionPacket();
-            actionPacket.common.act_no = ano;
-            actionPacket.common.act_type = Runbook.ACTION_TYPE.IMAGE;
-            actionPacket.data.image.image_no = (byte)imageNo;
-
-            // リストに追加
-            condPackets.Add(condPacket);
-            actionPackets.Add(actionPacket);
-
-            // cno , ano インクリメント
-            cno++;
-            ano++;
-
-            return res;
+            List<RunbookProcedure> procs = new List<RunbookProcedure>();
+            procs.Add(proc);
+            return procs;
         }
 
 
@@ -388,7 +332,15 @@ namespace KeCardWin
             subEventType = (int)VOICE_EVENT_TYPE.IMAGE;
         }
 
-}
+        // Runbookパケット取得
+        public override List<RunbookProcedure> getRunbookProcedure(int _no)
+        {
+            List<RunbookProcedure> procs = new List<RunbookProcedure>();
+            return procs;
+        }
+
+
+    }
 
 
     [Serializable]
@@ -422,7 +374,14 @@ namespace KeCardWin
 
         }
 
-}
+        // Runbookパケット取得
+        public override List<RunbookProcedure> getRunbookProcedure(int _no)
+        {
+            List<RunbookProcedure> procs = new List<RunbookProcedure>();
+            return procs;
+        }
+
+    }
 
 
 

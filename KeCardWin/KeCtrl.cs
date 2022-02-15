@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using System.Diagnostics;
 using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace KeCardWin
 {
@@ -19,8 +20,11 @@ namespace KeCardWin
         public static double txProgress = 0.0;      // 進捗状況
 
         public const int DISCONNECTED_WAIT = 10;          // 切断後のWait[sec]
-        public const int CONNECTED_WAIT = 100;             // 接続後のWait[ms]
-        public const int SLOW_CMD_WAIT = 1000;             // 接続後のWait[ms]
+        public const int CONNECTED_WAIT = 1000;             // 接続後のWait[ms]
+        public const int SLOW_CMD_WAIT = 15;             // 接続後のWait[ms]
+        public const int TIME_CMD_WAIT = 15;               // TimeCmd後のWait
+        public const int CLEAR_CMD_WAIT = 15;              // ClearCmd後のWait
+
 
         // 進捗用の定数
         const double TX_PROGRESS_START = 0.1;
@@ -49,6 +53,8 @@ namespace KeCardWin
             IMAGE_TX,           // イメージ転送中
             EVENT_TX,           // イベント転送中
             SWITCH_IMAGE,       // イメージ切り替え
+            READ_KECONFIG,      // keconfig読み込み
+            WRITE_KECONFIG,     // keconfig書き込み
         };
 
         static public WORK_MODE workMode = WORK_MODE.BLE_SCAN;          // 動作モード
@@ -122,7 +128,7 @@ namespace KeCardWin
 
             if (res) res = await keBle.SelectImage(no);
 
-            if (res) res = await keBle.SendCommand(KeBle.KE_CMD_ERASE_FLASH);
+            if (res) res = await keBle.SendCommand(Cmd.CMD_ERASE_FLASH);
 
             if (res) res = await keBle.WaitStatus(KeBle.KE_STATUS_FLASH_ERASE_SUCCESS, 20);
 
@@ -130,7 +136,7 @@ namespace KeCardWin
 
             if (res) res = await TransferImage(image, TX_PROGRESS_FINISHED - TX_PROGRESS_TX_START, waitAfterTransfer);
 
-            if (res) res = await keBle.SendCommand(KeBle.KE_CMD_DISPLAY);
+            if (res) res = await keBle.SendCommand(Cmd.CMD_DISPLAY);
 
             keBle.DisconnectKeCard();
             await keBle.WaitDisconnect(DISCONNECTED_WAIT);
@@ -168,11 +174,20 @@ namespace KeCardWin
 
             txProgress = EVENT_PROGRESS_CONNECTED;
 
+            // Ver確認
+            if (res) res = keBle.ver2Flag == true ? true : false;
 
+            // 時間コマンド送信
             if (res) res = await keBle.SendTimeCmd();
+            if (res) await Task.Delay(TIME_CMD_WAIT);
+            if (res) res = await keBle.WaitStatus(KeSts.KESTS_TIME | KeSts.KESTS_RESULT_SUCCESS, 10);
 
-            byte ano = 0;
-            byte cno = 0;
+            // クリアコマンド送信
+            if (res) res = await keBle.SendClearCmd(KeKey.CLEAR_TYPE_RUNBOOK);
+            if (res) await Task.Delay(CLEAR_CMD_WAIT);
+
+
+            int procNo = Runbook.PROCEDURE_NO_START;
             double per = (EVENT_PROGRESS_FINISHED - EVENT_PROGRESS_CONNECTED) / apEvents.apEvents.Count();
 
 
@@ -182,21 +197,16 @@ namespace KeCardWin
                 if (!res) break;
 
                 // Runbookのパケット取得
-                List<Runbook.CondPacket> condPackets = new List<Runbook.CondPacket>();
-                List<Runbook.ActionPacket> actionPackets = new List<Runbook.ActionPacket>();
-                apEvent.GetRunbookPackets(ref cno, ref ano, ref condPackets, ref actionPackets);
+                var procs = apEvent.getRunbookProcedure(procNo);
 
-                // 条件パケット送信
-                foreach (var condPacket in condPackets)
+                // 手順パケット送信
+                foreach (var proc in procs)
                 {
-                    if (res) res = await keBle.SendCondCmd(condPacket);
+                    if (res) res = await keBle.SendProcedureCmd(proc);
                 }
 
-                // アクションパケット送信
-                foreach (var actionPacket in actionPackets)
-                {
-                    if (res) res = await keBle.SendActCmd(actionPacket);
-                }
+                // 番号更新
+                procNo += procs.Count();
 
             }
 
@@ -215,7 +225,7 @@ namespace KeCardWin
                     if (res) res = await keBle.SelectImage((byte)no);
 
                     // 消去
-                    if (res) res = await keBle.SendCommand(KeBle.KE_CMD_ERASE_FLASH);
+                    if (res) res = await keBle.SendCommand(Cmd.CMD_ERASE_FLASH);
 
                     // 消去完了待ち
                     if (res) res = await keBle.WaitStatus(KeBle.KE_STATUS_FLASH_ERASE_SUCCESS, 20);
@@ -241,7 +251,7 @@ namespace KeCardWin
                 {
                     if (res) res = await keBle.SelectImage((byte)apEventInit.imageNo);
 
-                    if (res) res = await keBle.SendCommand(KeBle.KE_CMD_DISPLAY);
+                    if (res) res = await keBle.SendCommand(Cmd.CMD_DISPLAY);
                 }
             }
 
@@ -262,8 +272,7 @@ namespace KeCardWin
         {
             if (workMode == WORK_MODE.BLE_SCAN)
             {
-                List<ulong> devices = await keBle.ScanDevice(sec);
-                return devices;
+                return await keBle.ScanDevice(sec);
             }
             return new List<ulong>();
         }
@@ -291,6 +300,9 @@ namespace KeCardWin
             if (res) res = await keBle.ConnectKeCard(addr);
             if (res) await Task.Delay(CONNECTED_WAIT);
 
+            // Ver確認
+            if (res) res = keBle.ver2Flag == true ? true : false;
+
             // 進捗：40％
             txProgress = 0.4;
 
@@ -298,7 +310,7 @@ namespace KeCardWin
             if (res) res = await keBle.SendTimeCmd();
 
             // Slowコマンド送信
-            if (res) res = await KeCtrl.keBle.SendCommand(KeBle.KE_CMD_SLOW_MODE);
+            if (res) res = await KeCtrl.keBle.SendModeChangeCmd(false);
             if (res) await Task.Delay(SLOW_CMD_WAIT);
 
             // 進捗：50％
@@ -397,7 +409,7 @@ namespace KeCardWin
 
             if (res) res = await keBle.SelectImage(no);
 
-            if (res) res = await keBle.SendCommand(KeBle.KE_CMD_DISPLAY);
+            if (res) res = await keBle.SendCommand(Cmd.CMD_DISPLAY);
 
             // モード設定
             workMode = beforeMode;
@@ -406,6 +418,115 @@ namespace KeCardWin
         }
 
 
+        // keconfig読み込み
+        static public async Task<Tuple<bool,KeConfig>> ReadKeConfig(ulong addr)
+        {
+            bool res = true;
+            KeConfig keConfig = new KeConfig();
+
+            // モード設定
+            WORK_MODE beforeMode = workMode;
+            workMode = WORK_MODE.READ_KECONFIG;
+
+            txProgress = 0.1;
+
+            // BLE停止制御（失敗したら何もしない）
+            res = await StopBle(beforeMode);
+
+            txProgress = 0.2;
+
+            Debug.WriteLine("device:" + addr.ToString("X06"));
+
+            if (res) res = await keBle.ConnectKeCard(addr);
+            txProgress = TX_PROGRESS_CONNECTED;
+
+            txProgress = 0.4;
+
+            // Ver確認
+            if (res) res = keBle.ver2Flag == true ? true : false;
+
+
+            if (res)
+            {
+                var r = await keBle.SendRcvReadDataCmd(KeConfigDef.DATA_ADDR, (UInt16)(Marshal.SizeOf(typeof(KeConfig))));
+
+                res = r.Item1;
+
+                if(res)
+                {
+                    StructLib.BytesToStruct<KeConfig>(r.Item2, out keConfig);
+                }
+
+                txProgress = 0.8;
+
+            }
+
+            keBle.DisconnectKeCard();
+            await keBle.WaitDisconnect(DISCONNECTED_WAIT);
+
+            txProgress = 1.0;
+
+            // モード設定
+            workMode = WORK_MODE.IDLE;
+
+            return new Tuple<bool, KeConfig>( res , keConfig);
+
+        }
+
+
+        // keconfig読み込み
+        static public async Task<bool> WriteKeConfig(ulong addr , KeConfig keConfig)
+        {
+            bool res = true;
+
+            // モード設定
+            WORK_MODE beforeMode = workMode;
+            workMode = WORK_MODE.WRITE_KECONFIG;
+
+            txProgress = 0.1;
+
+            // BLE停止制御（失敗したら何もしない）
+            res = await StopBle(beforeMode);
+            txProgress = 0.2;
+
+
+            Debug.WriteLine("device:" + addr.ToString("X06"));
+
+            // BLE接続
+            if (res) res = await keBle.ConnectKeCard(addr);
+            txProgress = TX_PROGRESS_CONNECTED;
+            txProgress = 0.4;
+
+            // Ver確認
+            if (res) res = keBle.ver2Flag == true ? true : false;
+
+            // Erase
+            if (res) res = await keBle.SendEraseDataCmd(KeConfigDef.DATA_ADDR, 1);
+
+            txProgress = 0.7;
+
+            // Write
+            if (res)
+            {
+                byte[] data = StructLib.StructToBytes<KeConfig>(keConfig);
+
+                res = await keBle.SendWriteDataCmd(KeConfigDef.DATA_ADDR, data );
+
+                txProgress = 0.9;
+
+            }
+
+            // BLE切断
+            keBle.DisconnectKeCard();
+            await keBle.WaitDisconnect(DISCONNECTED_WAIT);
+
+            txProgress = 1.0;
+
+            // モード設定
+            workMode = WORK_MODE.IDLE;
+
+            return res;
+        }
 
         // BLEスキャンモード開始
         static public async Task<bool> SetScanMode()

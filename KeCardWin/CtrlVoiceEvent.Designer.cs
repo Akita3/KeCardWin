@@ -48,9 +48,10 @@ namespace KeCardWin
             // 
             // btnSelect
             // 
-            this.btnSelect.Location = new System.Drawing.Point(273, 138);
+            this.btnSelect.Location = new System.Drawing.Point(125, 72);
+            this.btnSelect.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.btnSelect.Name = "btnSelect";
-            this.btnSelect.Size = new System.Drawing.Size(143, 41);
+            this.btnSelect.Size = new System.Drawing.Size(66, 20);
             this.btnSelect.TabIndex = 39;
             this.btnSelect.Text = "画像選択";
             this.btnSelect.UseVisualStyleBackColor = true;
@@ -59,68 +60,76 @@ namespace KeCardWin
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(269, 44);
+            this.label6.Location = new System.Drawing.Point(125, 29);
+            this.label6.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(105, 24);
+            this.label6.Size = new System.Drawing.Size(53, 12);
             this.label6.TabIndex = 37;
             this.label6.Text = "キーワード";
             // 
             // txtKeyword
             // 
-            this.txtKeyword.Location = new System.Drawing.Point(380, 41);
+            this.txtKeyword.Location = new System.Drawing.Point(180, 26);
+            this.txtKeyword.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txtKeyword.Name = "txtKeyword";
-            this.txtKeyword.Size = new System.Drawing.Size(274, 31);
+            this.txtKeyword.Size = new System.Drawing.Size(129, 19);
             this.txtKeyword.TabIndex = 36;
             this.txtKeyword.Text = "たぬき";
             // 
             // lblH
             // 
             this.lblH.AutoSize = true;
-            this.lblH.Location = new System.Drawing.Point(589, 134);
+            this.lblH.Location = new System.Drawing.Point(273, 75);
+            this.lblH.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.lblH.Name = "lblH";
-            this.lblH.Size = new System.Drawing.Size(30, 24);
+            this.lblH.Size = new System.Drawing.Size(15, 12);
             this.lblH.TabIndex = 35;
             this.lblH.Text = "H:";
             // 
             // txtH
             // 
-            this.txtH.Location = new System.Drawing.Point(624, 131);
+            this.txtH.Location = new System.Drawing.Point(290, 72);
+            this.txtH.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txtH.Name = "txtH";
-            this.txtH.Size = new System.Drawing.Size(100, 31);
+            this.txtH.Size = new System.Drawing.Size(48, 19);
             this.txtH.TabIndex = 34;
             this.txtH.Text = "100";
             // 
             // lblW
             // 
             this.lblW.AutoSize = true;
-            this.lblW.Location = new System.Drawing.Point(589, 97);
+            this.lblW.Location = new System.Drawing.Point(272, 52);
+            this.lblW.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.lblW.Name = "lblW";
-            this.lblW.Size = new System.Drawing.Size(33, 24);
+            this.lblW.Size = new System.Drawing.Size(16, 12);
             this.lblW.TabIndex = 33;
             this.lblW.Text = "W:";
             // 
             // txtW
             // 
-            this.txtW.Location = new System.Drawing.Point(624, 94);
+            this.txtW.Location = new System.Drawing.Point(290, 49);
+            this.txtW.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txtW.Name = "txtW";
-            this.txtW.Size = new System.Drawing.Size(100, 31);
+            this.txtW.Size = new System.Drawing.Size(48, 19);
             this.txtW.TabIndex = 32;
             this.txtW.Text = "100";
             // 
             // lblY
             // 
             this.lblY.AutoSize = true;
-            this.lblY.Location = new System.Drawing.Point(441, 134);
+            this.lblY.Location = new System.Drawing.Point(204, 75);
+            this.lblY.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.lblY.Name = "lblY";
-            this.lblY.Size = new System.Drawing.Size(29, 24);
+            this.lblY.Size = new System.Drawing.Size(14, 12);
             this.lblY.TabIndex = 31;
             this.lblY.Text = "Y:";
             // 
             // txtY
             // 
-            this.txtY.Location = new System.Drawing.Point(476, 131);
+            this.txtY.Location = new System.Drawing.Point(220, 72);
+            this.txtY.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txtY.Name = "txtY";
-            this.txtY.Size = new System.Drawing.Size(100, 31);
+            this.txtY.Size = new System.Drawing.Size(48, 19);
             this.txtY.TabIndex = 30;
             this.txtY.Text = "0";
             // 
@@ -128,9 +137,10 @@ namespace KeCardWin
             // 
             this.picImage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.picImage.Image = global::KeCardWin.Properties.Resources.SAMPLE_IMAGE;
-            this.picImage.Location = new System.Drawing.Point(3, 3);
+            this.picImage.Location = new System.Drawing.Point(1, 2);
+            this.picImage.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.picImage.Name = "picImage";
-            this.picImage.Size = new System.Drawing.Size(264, 176);
+            this.picImage.Size = new System.Drawing.Size(122, 88);
             this.picImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picImage.TabIndex = 29;
             this.picImage.TabStop = false;
@@ -138,17 +148,19 @@ namespace KeCardWin
             // lblX
             // 
             this.lblX.AutoSize = true;
-            this.lblX.Location = new System.Drawing.Point(441, 97);
+            this.lblX.Location = new System.Drawing.Point(204, 54);
+            this.lblX.Margin = new System.Windows.Forms.Padding(1, 0, 1, 0);
             this.lblX.Name = "lblX";
-            this.lblX.Size = new System.Drawing.Size(29, 24);
+            this.lblX.Size = new System.Drawing.Size(14, 12);
             this.lblX.TabIndex = 28;
             this.lblX.Text = "X:";
             // 
             // txtX
             // 
-            this.txtX.Location = new System.Drawing.Point(476, 94);
+            this.txtX.Location = new System.Drawing.Point(220, 49);
+            this.txtX.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.txtX.Name = "txtX";
-            this.txtX.Size = new System.Drawing.Size(100, 31);
+            this.txtX.Size = new System.Drawing.Size(48, 19);
             this.txtX.TabIndex = 27;
             this.txtX.Text = "0";
             // 
@@ -156,17 +168,19 @@ namespace KeCardWin
             // 
             this.cmbSubEventType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbSubEventType.FormattingEnabled = true;
-            this.cmbSubEventType.Location = new System.Drawing.Point(273, 3);
+            this.cmbSubEventType.Location = new System.Drawing.Point(126, 2);
+            this.cmbSubEventType.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.cmbSubEventType.Name = "cmbSubEventType";
-            this.cmbSubEventType.Size = new System.Drawing.Size(381, 32);
+            this.cmbSubEventType.Size = new System.Drawing.Size(178, 20);
             this.cmbSubEventType.TabIndex = 40;
             this.cmbSubEventType.SelectedIndexChanged += new System.EventHandler(this.cmbSubEventType_SelectedIndexChanged);
             // 
             // btnRange
             // 
-            this.btnRange.Location = new System.Drawing.Point(273, 91);
+            this.btnRange.Location = new System.Drawing.Point(125, 48);
+            this.btnRange.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.btnRange.Name = "btnRange";
-            this.btnRange.Size = new System.Drawing.Size(143, 41);
+            this.btnRange.Size = new System.Drawing.Size(66, 20);
             this.btnRange.TabIndex = 41;
             this.btnRange.Text = "範囲選択";
             this.btnRange.UseVisualStyleBackColor = true;
@@ -174,7 +188,7 @@ namespace KeCardWin
             // 
             // CtrlVoiceEvent
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 24F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.btnRange);
             this.Controls.Add(this.cmbSubEventType);
@@ -190,8 +204,9 @@ namespace KeCardWin
             this.Controls.Add(this.picImage);
             this.Controls.Add(this.lblX);
             this.Controls.Add(this.txtX);
+            this.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.Name = "CtrlVoiceEvent";
-            this.Size = new System.Drawing.Size(760, 182);
+            this.Size = new System.Drawing.Size(351, 96);
             this.Load += new System.EventHandler(this.CtrlVoiceEvent_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picImage)).EndInit();
             this.ResumeLayout(false);

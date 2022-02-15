@@ -58,8 +58,7 @@ namespace KeCardWin
             NONE = 0x00,        // なし
             LOCAL = 0x01,       // 自分から切断
             REMOTE = 0x02,      // 相手から切断
-            TIMEOUT = 0x04,     // タイムアウト
-            UNKNOWN = 0x08,     // 不明
+            OTHER = 0x04,       // その他
             ALL = 0x0F,         // 全て
         };
 

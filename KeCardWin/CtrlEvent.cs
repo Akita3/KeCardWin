@@ -19,8 +19,6 @@ namespace KeCardWin
 
     public partial class CtrlEvent : UserControl
     {
-        public int CTRL_EVENT_X = 43;
-        public int CTRL_EVENT_Y = 41;
 
         public ApEvent apEvent = new ApEvent();
 
@@ -85,7 +83,11 @@ namespace KeCardWin
             // サブイベント
             picSubEvent.Visible = apEvent.isSubEvent;
 
-            ctrlEvent.Location = new Point(CTRL_EVENT_X, CTRL_EVENT_Y);
+            // 位置計算
+            int x = this.Width - ctrlEvent.Width;
+            int y = this.Height - ctrlEvent.Height;
+
+            ctrlEvent.Location = new Point(x, y);
             this.Controls.Add(ctrlEvent);
         }
 
